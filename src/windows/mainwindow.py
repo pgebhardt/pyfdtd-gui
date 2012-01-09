@@ -1,4 +1,6 @@
 from PySide import QtCore, QtGui
+from plot import *
+import numpy
 
 # Main window for pyfdtd-gui application
 class MainWindow(QtGui.QMainWindow):
@@ -12,3 +14,6 @@ class MainWindow(QtGui.QMainWindow):
     def init_gui(self):
         # set window title
         self.setWindowTitle('pyfdtd gui')
+        
+        self.resize(600, 600)        
+        self.figure = Plot((600, 600), self)
