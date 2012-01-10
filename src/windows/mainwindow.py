@@ -28,7 +28,7 @@ class MainWindow(QtGui.QMainWindow):
         self.resize(600, 600)        
         
         # create matplotlib plot
-        self.figure = Plot((600, 600), self)
+        self.figure = Plot((500, 500))
         self.ax = self.figure.fig.add_subplot(111)
         self.ax.imshow(numpy.zeros((200, 400)))
 
@@ -37,10 +37,10 @@ class MainWindow(QtGui.QMainWindow):
 
         # create layout
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.figure)
-        #grid.addWidget(btn)
+        #grid.addWidget(self.figure, 0, 0)
+        grid.addWidget(btn, 0, 1)
 
-        self.setCentralWidget(self.figure) 
+        self.setLayout(grid)
 
     def init_timer(self):
         self.timer = QtCore.QTimer(self)
@@ -57,9 +57,10 @@ class MainWindow(QtGui.QMainWindow):
         # add source
         f = source_from_string('40.0*math.exp(-(t-1e-9)**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*20e9*(t-1e-9))')
         self.solver.source[masks.ellipse(0.1, 0.05, 5, 0.001)] = source(f)
+
     def run_fdtd(self):
         # iterate
-        self.history = self.solver.solve(1e-9, saveHistory=True)
+        self.history = self.solver.solve(5e-9, saveHistory=True)
 
     def plot(self):
         if not hasattr(self, 'step'):

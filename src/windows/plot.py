@@ -11,17 +11,20 @@ from PySide import QtCore, QtGui
 import numpy
 
 class Plot(QtGui.QWidget):
-    def __init__(self, size, parent):
+    def __init__(self, size, parent=None):
         # call base class constructors
         super(Plot, self).__init__(parent)
-        
+
         # grid layout
         self.grid = QtGui.QGridLayout()
 
         # create matplotlib canvas
-        self.fig = Figure(figsize=size)
+        self.fig = Figure(figsize=size, dpi=72)
         self.canvas = FigureCanvas(self.fig)
         self.grid.addWidget(self.canvas, 0, 0)
 
         # set layout
         self.setLayout(self.grid)
+        
+        x, y = size
+        self.resize(x, y)
