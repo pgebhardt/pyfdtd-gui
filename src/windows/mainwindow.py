@@ -14,26 +14,31 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
 
         # initialize gui elements
-        self.init_gui()
         self.init_fdtd()
+        self.init_gui()
         self.init_timer()
-
-        # run fdtd
-        self.run_fdtd()
-        self.timer.start(50)
 
     def init_gui(self):
         # set window title
         self.setWindowTitle('pyfdtd gui')
         self.resize(600, 600)        
         
-        # create matplotlib plot
-        self.canvas = matplotlibCanvas(self, 5.0, 5.0, dpi=72, title='bla')
+        # create Container
+        self.container = QtGui.QWidget(self)
+        self.setCentralWidget(self.container)
 
+        # create matplotlib plot
+        self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='bla')
+
+        # create button
+        btn = QtGui.QPushButton('start simulation')
+        btn.clicked.connect(self.run_fdtd)
+
+        # layout
         grid = QtGui.QGridLayout()
-        #grid.addWidget(self.canvas, 0, 0)
-        grid.addWidget(QtGui.QPushButton('Yo'), 0, 1)
-        self.setLayout(grid)
+        grid.addWidget(self.canvas, 0, 0)
+        grid.addWidget(btn, 1, 0)
+        self.container.setLayout(grid)
 
     def init_timer(self):
         self.timer = QtCore.QTimer(self)
@@ -41,19 +46,20 @@ class MainWindow(QtGui.QMainWindow):
 
     def init_fdtd(self):
         # create solver
-        self.solver = solver(field(0.2, 0.4, deltaX=0.001))
+        self.solver = solver(field(0.2, 0.2, deltaX=0.001))
 
         # add material
-        self.solver.material['electric'][mask_from_string('x - 0.02*sin(2.0*pi*8.0*y) - 0.11 > 0.0')] = material.epsilon(sigma=59.1e6)
-        self.solver.material['electric'][mask_from_string('x - 0.02*sin(2.0*pi*8.0*y) - 0.09 < 0.0')] = material.epsilon(sigma=59.1e6)
+        self.solver.material['electric'][mask_from_string('(x-0.1)**2 + (y-0.1)**2 > 0.07**2')] = material.epsilon(sigma=59.1e6)
+        #self.solver.material['electric'][mask_from_string('x - 0.02*sin(2.0*pi*8.0*y) - 0.09 < 0.0')] = material.epsilon(sigma=59.1e6)
 
         # add source
-        f = source_from_string('40.0*math.exp(-(t-1e-9)**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*20e9*(t-1e-9))')
-        self.solver.source[masks.ellipse(0.1, 0.05, 5, 0.001)] = source(f)
+        f = source_from_string('1e3*math.exp(-(t-1e-9)**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*20e9*(t-1e-9))')
+        self.solver.source[masks.ellipse(0.1, 0.1, 0.001)] = source(f)
 
     def run_fdtd(self):
         # iterate
-        self.history = self.solver.solve(1e-9, saveHistory=True)
+        self.history = self.solver.solve(5e-9, saveHistory=True)
+        self.timer.start(50)
 
     def plot(self):
         if not hasattr(self, 'step'):
@@ -61,7 +67,7 @@ class MainWindow(QtGui.QMainWindow):
         
         # plot current image
         if not hasattr(self, 'im'):
-            self.im = self.canvas.axes_top.imshow(numpy.fabs(self.history[self.step]), norm=colors.Normalize(0.0, 10.0))
+            self.im = self.canvas.axes.imshow(numpy.fabs(self.history[self.step]), norm=colors.Normalize(0.0, 10.0))
         else:
             self.im.set_array(self.history[self.step])
 

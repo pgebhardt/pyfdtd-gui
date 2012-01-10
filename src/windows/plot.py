@@ -34,12 +34,10 @@ class matplotlibCanvas(FigureCanvas):
     def __init__(self, parent=None, width=8, height=4, dpi=100, title=None):
         
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes_top = fig.add_subplot(211)
-        self.axes_bottom = fig.add_subplot(212)
-            
+        self.axes = fig.add_subplot(111)
+                    
         # We want the axes cleared every time plot() is called
-        self.axes_top.hold(False)
-        self.axes_bottom.hold(False)
+        self.axes.hold(False)
                    
         if title != None:
             fig.suptitle(title, fontsize=12)
