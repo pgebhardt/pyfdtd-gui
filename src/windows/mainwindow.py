@@ -17,3 +17,9 @@ class MainWindow(QtGui.QMainWindow):
         
         self.resize(600, 600)        
         self.figure = Plot((600, 600), self)
+
+        self.setCentralWidget(self.figure)
+        ax = self.figure.fig.add_subplot(111)
+        
+        x = numpy.linspace(0.0, 10.0, 100)
+        ax.plot(x, x**2)

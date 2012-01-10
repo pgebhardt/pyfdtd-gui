@@ -15,16 +15,13 @@ class Plot(QtGui.QWidget):
         # call base class constructors
         super(Plot, self).__init__(parent)
         
-        # resize
-        x, y = size
-        self.resize(x, y)
+        # grid layout
+        self.grid = QtGui.QGridLayout()
 
-        # set figure
-        self.fig = Figure(figsize=size, dpi=72)
-        ax = self.fig.add_subplot(111)
-        
-        x = numpy.linspace(0.0, 5.0, 100)
-        ax.plot(x, x**2)
-
+        # create matplotlib canvas
+        self.fig = Figure(figsize=size)
         self.canvas = FigureCanvas(self.fig)
-        self.canvas.setParent(self)
+        self.grid.addWidget(self.canvas, 0, 0)
+
+        # set layout
+        self.setLayout(self.grid)

@@ -7,4 +7,5 @@ app = QtGui.QApplication(sys.argv)
 
 mainWindow = windows.MainWindow()
 mainWindow.show()
+
 sys.exit(app.exec_())
