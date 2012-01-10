@@ -28,18 +28,11 @@ class MainWindow(QtGui.QMainWindow):
         self.resize(600, 600)        
         
         # create matplotlib plot
-        self.figure = Plot((500, 500))
-        self.ax = self.figure.fig.add_subplot(111)
-        self.ax.imshow(numpy.zeros((200, 400)))
+        self.canvas = matplotlibCanvas(self, 5.0, 5.0, dpi=72, title='bla')
 
-        # create button
-        btn = QtGui.QPushButton('run')
-
-        # create layout
         grid = QtGui.QGridLayout()
-        #grid.addWidget(self.figure, 0, 0)
-        grid.addWidget(btn, 0, 1)
-
+        #grid.addWidget(self.canvas, 0, 0)
+        grid.addWidget(QtGui.QPushButton('Yo'), 0, 1)
         self.setLayout(grid)
 
     def init_timer(self):
@@ -60,7 +53,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def run_fdtd(self):
         # iterate
-        self.history = self.solver.solve(5e-9, saveHistory=True)
+        self.history = self.solver.solve(1e-9, saveHistory=True)
 
     def plot(self):
         if not hasattr(self, 'step'):
@@ -68,7 +61,7 @@ class MainWindow(QtGui.QMainWindow):
         
         # plot current image
         if not hasattr(self, 'im'):
-            self.im = self.ax.imshow(numpy.fabs(self.history[self.step]), norm=colors.Normalize(0.0, 10.0))
+            self.im = self.canvas.axes_top.imshow(numpy.fabs(self.history[self.step]), norm=colors.Normalize(0.0, 10.0))
         else:
             self.im.set_array(self.history[self.step])
 
@@ -77,5 +70,4 @@ class MainWindow(QtGui.QMainWindow):
         if self.step >= len(self.history):
             self.step = 0
 
-        self.figure.canvas.draw()
-    
+        self.canvas.draw() 

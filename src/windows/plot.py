@@ -28,3 +28,24 @@ class Plot(QtGui.QWidget):
         
         x, y = size
         self.resize(x, y)
+
+class matplotlibCanvas(FigureCanvas):       
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+    def __init__(self, parent=None, width=8, height=4, dpi=100, title=None):
+        
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes_top = fig.add_subplot(211)
+        self.axes_bottom = fig.add_subplot(212)
+            
+        # We want the axes cleared every time plot() is called
+        self.axes_top.hold(False)
+        self.axes_bottom.hold(False)
+                   
+        if title != None:
+            fig.suptitle(title, fontsize=12)
+           
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+           
+        FigureCanvas.setSizePolicy(self, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
