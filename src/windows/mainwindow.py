@@ -13,7 +13,7 @@ class MainWindow(QtGui.QMainWindow):
     def init_gui(self):
         # set window title
         self.setWindowTitle('pyfdtd gui')
-        self.resize(600, 600)        
+        self.resize(1000, 600)        
         
         # create Container
         self.container = QtGui.QWidget(self)
@@ -28,15 +28,12 @@ class MainWindow(QtGui.QMainWindow):
 
         # create treeview
         treeWidget = QtGui.QTreeWidget()
-        treeWidget.setText(0, 'bla')
-        cities =  QtGui.QTreeWidgetItem(treeWidget)
-        cities.setText(0, 'Cities')
-        osloItem =  QtGui.QTreeWidgetItem(cities)
-        osloItem.setText(0, 'Oslo')
-        osloItem.setText(1, 'Yes') 
-        planets = QtGui.QTreeWidgetItem(treeWidget, cities)
-        planets.setText(0, 'Planets')
-
+        treeWidget.setColumnCount(2)
+        items = []
+        for i in range(10):
+            items.append(QtGui.QTreeWidgetItem(None, ['item: {}'.format(i), 'bla']))
+        treeWidget.addTopLevelItems(items) 
+        
         # layout
         grid = QtGui.QGridLayout()
         grid.addWidget(self.canvas, 0, 0)
