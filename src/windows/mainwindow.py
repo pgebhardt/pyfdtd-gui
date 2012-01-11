@@ -28,6 +28,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # create treeview
         treeWidget = QtGui.QTreeWidget()
+        treeWidget.setText(0, 'bla')
         cities =  QtGui.QTreeWidgetItem(treeWidget)
         cities.setText(0, 'Cities')
         osloItem =  QtGui.QTreeWidgetItem(cities)
