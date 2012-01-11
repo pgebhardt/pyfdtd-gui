@@ -8,6 +8,7 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
 
         # initialize gui elements
+        self.create_actions()
         self.init_gui()
 
     def init_gui(self):
@@ -15,6 +16,11 @@ class MainWindow(QtGui.QMainWindow):
         self.setWindowTitle('pyfdtd gui')
         self.resize(1000, 600)        
         
+        # create menu bar
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(self.exitAction)
+
         # create Container
         self.container = QtGui.QWidget(self)
         self.setCentralWidget(self.container)
@@ -40,3 +46,10 @@ class MainWindow(QtGui.QMainWindow):
         grid.addWidget(btn, 1, 0)
         grid.addWidget(treeWidget, 0, 1)
         self.container.setLayout(grid)
+
+    def create_actions(self):
+        # exit action
+        self.exitAction = QtGui.QAction('&Extit', self)
+        self.exitAction.setShortcut('Ctrl+Q')
+        self.exitAction.setStatusTip('Exit application')
+        self.exitAction.triggered.connect(self.close)
