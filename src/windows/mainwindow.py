@@ -13,7 +13,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def init_gui(self):
         # set window title
-        self.setWindowTitle('pyfdtd gui')
+        self.setWindowTitle('Pyfdtd GUI')
         self.resize(1000, 600)        
         
         # create menu bar
@@ -63,7 +63,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def create_actions(self):
         # exit action
-        self.exitAction = QtGui.QAction('&Extit', self)
+        self.exitAction = QtGui.QAction('&Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit application')
         self.exitAction.triggered.connect(self.close)
