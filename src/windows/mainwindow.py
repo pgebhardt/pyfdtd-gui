@@ -82,7 +82,5 @@ class MainWindow(QtGui.QMainWindow):
 
     def new_layer(self):
         # create dialog
-        print 'bla'
         self.newLayerDialog = dialogs.NewLayerDialog()
         self.newLayerDialog.show()
-        print 'blupp'
