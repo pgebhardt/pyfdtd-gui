@@ -40,15 +40,26 @@ class MainWindow(QtGui.QMainWindow):
         # create treeview
         treeGrid = QtGui.QGridLayout()
         treeLabel = QtGui.QLabel('Layer:')
+
+        # new Layer Button
+        def new_layer_clicked():
+            self.newLayerDialog = dialogs.NewLayer(mainWindow=self)
+            self.newLayerDialog.okButton.clicked.connect(self.new_layer)
+            self.newLayerDialog.show()
+
         newLayerButton = QtGui.QPushButton('New Layer')
-        newLayerButton.clicked.connect(self.new_layer)
+        newLayerButton.clicked.connect(new_layer_clicked)
 
         self.treeWidget = QtGui.QTreeWidget()
-        self.treeWidget.setColumnCount(2)
+        self.treeWidget.setHeaderLabels(['Name', 'Mask', 'Function'])
         treeLabel.setBuddy(self.treeWidget)
 
         # update tree
-        self.update_tree()
+        self.layerItems = []
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
+        self.treeWidget.addTopLevelItems(self.layerItems)
 
         treeGrid.addWidget(treeLabel, 0, 0)
         treeGrid.addWidget(self.treeWidget, 1, 0)
@@ -69,18 +80,28 @@ class MainWindow(QtGui.QMainWindow):
         self.exitAction.triggered.connect(self.close)
 
     def update_tree(self):
-        topItems = []
-        topItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
-        topItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
-        topItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
-        self.treeWidget.addTopLevelItems(topItems)
-        
         QtGui.QTreeWidgetItem(topItems[-1], ['Radar 1', 'sin(2.0*pi*x)'])
         QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 1', 'blupp'])
         QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 2', 'bla'])
         QtGui.QTreeWidgetItem(topItems[1], ['Magnet', 'kreis'])
 
     def new_layer(self):
-        # create dialog
-        self.newLayerDialog = dialogs.NewLayerDialog()
-        self.newLayerDialog.show()
+        # close dialog
+        self.newLayerDialog.close()
+
+        # get attributes
+        name = self.newLayerDialog.nameEdit.text()
+        type_ = self.newLayerDialog.typeComboBox.currentText()
+        mask = self.newLayerDialog.maskEdit.text()
+        function = self.newLayerDialog.functionEdit.text()
+
+        # create layer
+        if type_ == 'Electric':
+            QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, function])
+            self.simulation.material['electric'][mask_from_string(mask)] = function
+        elif type_ == 'Magnetic':
+            QtGui.QTreeWidgetItem(self.layerItems[1], [name, mask, function])
+            self.simulation.material['magentic'][mask_from_string(mask)] = function
+        elif type_ == 'Source':
+            QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
+            self.simulation.source[mask_from_string] = source_from_string(function)

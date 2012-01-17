@@ -1,12 +1,15 @@
 from PySide import QtGui, QtCore
 
-class NewLayerDialog(QtGui.QWidget):
-    def __init__(self):
+class NewLayer(QtGui.QWidget):
+    def __init__(self, mainWindow=None):
         # call base class constructor
-        super(NewLayerDialog, self).__init__()
+        super(NewLayer, self).__init__()
 
         # init gui
         self.init_gui()
+
+        # save parameter
+        self.mainWindow = mainWindow
 
     def init_gui(self):
         # set window title
@@ -18,9 +21,8 @@ class NewLayerDialog(QtGui.QWidget):
         # create buttons
         buttonGrid = QtGui.QGridLayout()
 
-        okButton = QtGui.QPushButton('OK')
-        okButton.clicked.connect(self.get_layer)
-        buttonGrid.addWidget(okButton, 0, 0)
+        self.okButton = QtGui.QPushButton('OK')
+        buttonGrid.addWidget(self.okButton, 0, 0)
 
         cancleButton = QtGui.QPushButton('cancle')
         cancleButton.clicked.connect(self.close)
@@ -53,6 +55,3 @@ class NewLayerDialog(QtGui.QWidget):
         root.addWidget(functionLabel, 3, 0)
         root.addWidget(self.functionEdit, 3, 1)
         root.addLayout(buttonGrid, 4, 1)
-
-    def get_layer(self):
-        pass
