@@ -1,11 +1,16 @@
 from PySide import QtCore, QtGui
+from pyfdtd import *
 from plot import *
+import dialogs
 
 # Main window for pyfdtd-gui application
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         # call base class constructor
         super(MainWindow, self).__init__()
+
+        # init simulation
+        self.simulation = solver(field(0.4, 0.4, 0.001))
 
         # initialize gui elements
         self.create_actions()
@@ -35,29 +40,24 @@ class MainWindow(QtGui.QMainWindow):
         # create treeview
         treeGrid = QtGui.QGridLayout()
         treeLabel = QtGui.QLabel('Layer:')
+        newLayerButton = QtGui.QPushButton('New Layer')
+        newLayerButton.clicked.connect(lambda : dialogs.NewLayerDialog(show=True, mainWindow=self))
 
-        treeWidget = QtGui.QTreeWidget()
-        treeWidget.setColumnCount(2)
-        treeLabel.setBuddy(treeWidget)
+        self.treeWidget = QtGui.QTreeWidget()
+        self.treeWidget.setColumnCount(2)
+        treeLabel.setBuddy(self.treeWidget)
 
-        topItems = []
-        topItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
-        topItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
-        topItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
-        treeWidget.addTopLevelItems(topItems)
-        
-        QtGui.QTreeWidgetItem(topItems[-1], ['Radar 1', 'sin(2.0*pi*x)'])
-        QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 1', 'blupp'])
-        QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 2', 'bla'])
-        QtGui.QTreeWidgetItem(topItems[1], ['Magnet', 'kreis'])
+        # update tree
+        self.update_tree()
 
         treeGrid.addWidget(treeLabel, 0, 0)
-        treeGrid.addWidget(treeWidget, 1, 0)
+        treeGrid.addWidget(self.treeWidget, 1, 0)
 
         # layout
         grid = QtGui.QGridLayout()
         grid.addWidget(self.canvas, 0, 0)
         grid.addWidget(btn, 1, 0)
+        grid.addWidget(newLayerButton, 1, 1)
         grid.addLayout(treeGrid, 0, 1)
         self.container.setLayout(grid)
 
@@ -67,3 +67,15 @@ class MainWindow(QtGui.QMainWindow):
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit application')
         self.exitAction.triggered.connect(self.close)
+
+    def update_tree(self):
+        topItems = []
+        topItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
+        topItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
+        topItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
+        self.treeWidget.addTopLevelItems(topItems)
+        
+        QtGui.QTreeWidgetItem(topItems[-1], ['Radar 1', 'sin(2.0*pi*x)'])
+        QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 1', 'blupp'])
+        QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 2', 'bla'])
+        QtGui.QTreeWidgetItem(topItems[1], ['Magnet', 'kreis'])
