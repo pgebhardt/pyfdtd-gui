@@ -1,5 +1,6 @@
 from PySide import QtCore, QtGui
 from pyfdtd import *
+from plugins import *
 from plot import *
 import dialogs
 
@@ -97,11 +98,13 @@ class MainWindow(QtGui.QMainWindow):
 
         # create layer
         if type_ == 'Electric':
-            QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, function])
-            self.simulation.material['electric'][mask_from_string(mask)] = function
+            er, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
+            QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
+            self.simulation.material['electric'][mask_from_string(mask)] = material.epsilon(er=er, sigma=sigma)
         elif type_ == 'Magnetic':
-            QtGui.QTreeWidgetItem(self.layerItems[1], [name, mask, function])
-            self.simulation.material['magentic'][mask_from_string(mask)] = function
+            mur, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
+            QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
+            self.simulation.material['electric'][mask_from_string(mask)] = material.mu(mur=mur, sigma=sigma)
         elif type_ == 'Source':
             QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
             self.simulation.source[mask_from_string] = source_from_string(function)
