@@ -41,7 +41,7 @@ class MainWindow(QtGui.QMainWindow):
         treeGrid = QtGui.QGridLayout()
         treeLabel = QtGui.QLabel('Layer:')
         newLayerButton = QtGui.QPushButton('New Layer')
-        newLayerButton.clicked.connect(lambda : dialogs.NewLayerDialog(show=True, mainWindow=self))
+        newLayerButton.clicked.connect(self.new_layer)
 
         self.treeWidget = QtGui.QTreeWidget()
         self.treeWidget.setColumnCount(2)
@@ -79,3 +79,10 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 1', 'blupp'])
         QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 2', 'bla'])
         QtGui.QTreeWidgetItem(topItems[1], ['Magnet', 'kreis'])
+
+    def new_layer(self):
+        # create dialog
+        print 'bla'
+        self.newLayerDialog = dialogs.NewLayerDialog()
+        self.newLayerDialog.show()
+        print 'blupp'

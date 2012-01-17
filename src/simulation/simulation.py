@@ -1,3 +1,0 @@
-from pyfdtd import *
-
-:e
