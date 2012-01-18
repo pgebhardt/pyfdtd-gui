@@ -45,8 +45,6 @@ class Plot(QtGui.QWidget):
 
         # create canvas
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
-        self.im = self.canvas.axes.imshow(numpy.fabs(self.simulation.field.oddFieldX['field']), norm=colors.Normalize(0.0, 10.0), extent=[0.0, self.simulation.field.xSize, 0.0, self.simulation.field.ySize])
-        self.canvas.axes.grid(True)
 
         # create layout
         grid = QtGui.QGridLayout()
@@ -57,6 +55,10 @@ class Plot(QtGui.QWidget):
         self.update()
 
     def update(self):
+        # redraw im
+        self.im = self.canvas.axes.imshow(numpy.fabs(self.simulation.field.oddFieldX['field']), norm=colors.Normalize(0.0, 10.0), extent=[0.0, self.simulation.field.ySize, 0.0, self.simulation.field.xSize])
+        self.canvas.axes.grid(True)
+
         # cummulate all layer masks
         self.masks = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
 

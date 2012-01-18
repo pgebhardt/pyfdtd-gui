@@ -88,13 +88,27 @@ class MainWindow(QtGui.QMainWindow):
 
     def update_settings(self):
         # new settings callback
-        def new_settings(xSize, ySize, deltaX, deltaY):
-            self.simulation = solver(field(xSize, ySize, deltaX, seltaY))
-            self.plot.simulation = self.simulation
-            self.plot.update()
+        def new_settings():
+            # close dialog
+            self.settingsDialog.close()
 
+            # update simulation
+            self.simulation = solver(field(float(self.settingsDialog.xSizeEdit.text()), float(self.settingsDialog.ySizeEdit.text()), float(self.settingsDialog.deltaYEdit.text()), float(self.settingsDialog.deltaYEdit.text())))
+            self.plot.simulation = self.simulation
+            self.plot.simulationHistory = [numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
+            self.plot.update()
+            
         # create dialog
         self.settingsDialog = dialogs.Settings()
+        self.settingsDialog.okButton.clicked.connect(new_settings)
+
+        # set settings
+        self.settingsDialog.xSizeEdit.setText('{}'.format(self.simulation.field.xSize))
+        self.settingsDialog.ySizeEdit.setText('{}'.format(self.simulation.field.ySize))
+        self.settingsDialog.deltaXEdit.setText('{}'.format(self.simulation.field.deltaX))
+        self.settingsDialog.deltaYEdit.setText('{}'.format(self.simulation.field.deltaY))
+
+        # show dialog
         self.settingsDialog.show()
 
     def new_layer(self):
