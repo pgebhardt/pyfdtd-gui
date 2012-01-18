@@ -61,10 +61,10 @@ class Plot(QtGui.QWidget):
         self.masks = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
 
         # get electric layer
-        for fX, fY, dX, dY, mask in self.simulation.material['electric'].layer:
+        for fX, fY, dX, dY, mask in self.simulation.material['electric'].layer[1:]:
             self.masks += mask
         
-        #self.masks = numpy.where(self.masks < 1.0, self.masks, 1.0)
+        self.masks *= 1.0/numpy.max(self.masks)
 
         # plot
         self.plot()
@@ -72,8 +72,6 @@ class Plot(QtGui.QWidget):
     def plot(self):
         # plot
         self.im.set_array(self.masks + self.simulationHistory[self.step])
-
-        print 'plot'
 
         # update canvas
         self.canvas.draw()
