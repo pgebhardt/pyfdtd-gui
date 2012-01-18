@@ -1,2 +1,2 @@
 from newLayer import *
-from settings import *
+from newSimulation import *

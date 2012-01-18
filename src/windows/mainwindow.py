@@ -25,7 +25,7 @@ class MainWindow(QtGui.QMainWindow):
         
         # create menu bar
         fileMenu = self.menuBar().addMenu('&File')
-        fileMenu.addAction(self.settingsAction)
+        fileMenu.addAction(self.newAction)
         fileMenu.addAction(self.exitAction)
 
         # create Container
@@ -57,16 +57,8 @@ class MainWindow(QtGui.QMainWindow):
         self.treeWidget.setHeaderLabels(['Name', 'Mask', 'Function'])
         treeLabel.setBuddy(self.treeWidget)
 
-        # update tree
-        self.layerItems = []
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
-        self.treeWidget.addTopLevelItems(self.layerItems)
-
-        # add PML layer
-        QtGui.QTreeWidgetItem(self.layerItems[0], ['PML', '', ''])
-        QtGui.QTreeWidgetItem(self.layerItems[1], ['PML', '', ''])
+        # init tree
+        self.init_tree()
 
         treeGrid.addWidget(treeLabel, 0, 0)
         treeGrid.addWidget(self.treeWidget, 1, 0)
@@ -79,37 +71,55 @@ class MainWindow(QtGui.QMainWindow):
         grid.addLayout(treeGrid, 0, 1)
         self.container.setLayout(grid)
 
+    def init_tree(self):
+        # clear tree
+        self.treeWidget.clear()
+
+        # init tree
+        self.layerItems = []
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
+        self.treeWidget.addTopLevelItems(self.layerItems)
+
+        # add PML layer
+        QtGui.QTreeWidgetItem(self.layerItems[0], ['PML', '', ''])
+        QtGui.QTreeWidgetItem(self.layerItems[1], ['PML', '', ''])
+        
     def create_actions(self):
         # settings action
-        self.settingsAction = QtGui.QAction('&Settings', self, statusTip='Set domain size', triggered=self.update_settings)
+        self.newAction = QtGui.QAction('&New', self, shortcut='Ctrl+N', statusTip='New simulation', triggered=self.new_simulation)
 
         # exit action
         self.exitAction = QtGui.QAction('&Exit', self, shortcut='Ctrl+Q', statusTip='Exit application', triggered=self.close)
 
-    def update_settings(self):
-        # new settings callback
-        def new_settings():
+    def new_simulation(self):
+        # new simulation callback
+        def new_simulation():
             # close dialog
-            self.settingsDialog.close()
+            self.newSimDialog.close()
 
             # update simulation
-            self.simulation = solver(field(float(self.settingsDialog.xSizeEdit.text()), float(self.settingsDialog.ySizeEdit.text()), float(self.settingsDialog.deltaYEdit.text()), float(self.settingsDialog.deltaYEdit.text())))
+            self.simulation = solver(field(float(self.newSimDialog.xSizeEdit.text()), float(self.newSimDialog.ySizeEdit.text()), float(self.newSimDialog.deltaYEdit.text()), float(self.newSimDialog.deltaYEdit.text())))
             self.plot.simulation = self.simulation
             self.plot.simulationHistory = [numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
             self.plot.update()
+
+            # init tree
+            self.init_tree()
             
         # create dialog
-        self.settingsDialog = dialogs.Settings()
-        self.settingsDialog.okButton.clicked.connect(new_settings)
+        self.newSimDialog = dialogs.NewSimulation()
+        self.newSimDialog.okButton.clicked.connect(new_simulation)
 
         # set settings
-        self.settingsDialog.xSizeEdit.setText('{}'.format(self.simulation.field.xSize))
-        self.settingsDialog.ySizeEdit.setText('{}'.format(self.simulation.field.ySize))
-        self.settingsDialog.deltaXEdit.setText('{}'.format(self.simulation.field.deltaX))
-        self.settingsDialog.deltaYEdit.setText('{}'.format(self.simulation.field.deltaY))
+        self.newSimDialog.xSizeEdit.setText('{}'.format(self.simulation.field.xSize))
+        self.newSimDialog.ySizeEdit.setText('{}'.format(self.simulation.field.ySize))
+        self.newSimDialog.deltaXEdit.setText('{}'.format(self.simulation.field.deltaX))
+        self.newSimDialog.deltaYEdit.setText('{}'.format(self.simulation.field.deltaY))
 
         # show dialog
-        self.settingsDialog.show()
+        self.newSimDialog.show()
 
     def new_layer(self):
         # close dialog
@@ -122,17 +132,22 @@ class MainWindow(QtGui.QMainWindow):
         function = self.newLayerDialog.functionEdit.text()
 
         # create layer
-        if type_ == 'Electric':
-            er, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
-            QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
-            self.simulation.material['electric'][mask_from_string(mask)] = material.epsilon(er=er, sigma=sigma)
-        elif type_ == 'Magnetic':
-            mur, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
-            QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
-            self.simulation.material['electric'][mask_from_string(mask)] = material.mu(mur=mur, sigma=sigma)
-        elif type_ == 'Source':
-            QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
-            self.simulation.source[mask_from_string(mask)] = source_from_string(function)
+        try:
+            if type_ == 'Electric':
+                er, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
+                self.simulation.material['electric'][mask_from_string(mask)] = material.epsilon(er=er, sigma=sigma)
+                QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
+            elif type_ == 'Magnetic':
+                mur, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
+                self.simulation.material['electric'][mask_from_string(mask)] = material.mu(mur=mur, sigma=sigma)
+                QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
+            elif type_ == 'Source':
+                self.simulation.source[mask_from_string(mask)] = source_from_string(function)
+                QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
+        except SyntaxError:
+            return
+        except NameError:
+            return
 
         # update plot
         self.plot.update()
@@ -140,7 +155,7 @@ class MainWindow(QtGui.QMainWindow):
     def run_simulation(self):
         # progress function
         self.simulationHistory = []
-        duration = 1.0e-9
+        duration = 5.0e-9
         def progress(t, deltaT, field):
             xShape, yShape = field.oddFieldX['flux'].shape
             interval = xShape*yShape*duration/(256e6/4.0)
