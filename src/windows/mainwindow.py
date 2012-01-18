@@ -172,7 +172,6 @@ class MainWindow(QtGui.QMainWindow):
         def finish():
             # start timer
             self.plot.show_simulation(self.simulationHistory)
-            print 'finish'
 
         # run simulation
         self.simulation.solve(duration, progressfunction=progress, finishfunction=finish) 
