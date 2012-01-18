@@ -1,4 +1,5 @@
 from PySide import QtCore, QtGui
+import matplotlib.colors as colors
 from pyfdtd import *
 from plugins import *
 from plot import *
@@ -12,6 +13,10 @@ class MainWindow(QtGui.QMainWindow):
 
         # init simulation
         self.simulation = solver(field(0.4, 0.4, 0.001))
+
+        # init timer
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.plot)
 
         # initialize gui elements
         self.create_actions()
@@ -33,10 +38,12 @@ class MainWindow(QtGui.QMainWindow):
 
         # create matplotlib plot
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='bla')
+        self.im = self.canvas.axes.imshow(numpy.fabs(self.simulation.field.oddFieldX['field']), norm=colors.Normalize(0.0, 10.0))
 
         # create button
-        btn = QtGui.QPushButton('start simulation')
-        btn.resize(btn.sizeHint())
+        startSimButton = QtGui.QPushButton('start simulation')
+        startSimButton.resize(startSimButton.sizeHint())
+        startSimButton.clicked.connect(self.run_simulation)
 
         # create treeview
         treeGrid = QtGui.QGridLayout()
@@ -68,7 +75,7 @@ class MainWindow(QtGui.QMainWindow):
         # layout
         grid = QtGui.QGridLayout()
         grid.addWidget(self.canvas, 0, 0)
-        grid.addWidget(btn, 1, 0)
+        grid.addWidget(startSimButton, 1, 0)
         grid.addWidget(newLayerButton, 1, 1)
         grid.addLayout(treeGrid, 0, 1)
         self.container.setLayout(grid)
@@ -107,4 +114,43 @@ class MainWindow(QtGui.QMainWindow):
             self.simulation.material['electric'][mask_from_string(mask)] = material.mu(mur=mur, sigma=sigma)
         elif type_ == 'Source':
             QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
-            self.simulation.source[mask_from_string] = source_from_string(function)
+            self.simulation.source[mask_from_string(mask)] = source_from_string(function)
+
+    def run_simulation(self):
+        # progress function
+        self.simulationHistory = []
+        duration = 1.0e-9
+        def progress(t, deltaT, field):
+            xShape, yShape = field.oddFieldX['flux'].shape
+            interval = xShape*yShape*duration/(256e6/4.0)
+
+            # save history
+            if t/deltaT % (interval/deltaT) < 1.0:
+                self.simulationHistory.append(field.oddFieldX['field'] + field.oddFieldY['field'])
+            
+            # print progess
+            if t/deltaT % 100 < 1.0:
+                print '{}'.format(t*100.0/duration)
+
+        # finish function
+        def finish():
+            # start timer
+            self.timer.start(50)
+            print 'finish'
+
+        # run simulation
+        self.simulation.solve(duration, progressfunction=progress, finishfunction=finish)
+
+    def plot(self):
+        if not hasattr(self, 'step'):
+            self.step = 0
+        
+        # plot current image
+        self.im.set_array(self.simulationHistory[self.step])
+
+        # increment step
+        self.step += 1
+        if self.step >= len(self.simulationHistory):
+            self.step = 0
+
+        self.canvas.draw()

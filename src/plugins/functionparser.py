@@ -1,4 +1,6 @@
+from pyfdtd import *
 from numpy import *
+from math import *
 
 def mask_from_string(expression):
     def res(x, y):
@@ -8,6 +10,6 @@ def mask_from_string(expression):
     return res
 
 def source_from_string(expression):
-    def res(t):
-        return eval(expression)
+    def res(flux, deltaT, t, mem):
+        return -0.5*deltaT*eval(expression)
     return res
