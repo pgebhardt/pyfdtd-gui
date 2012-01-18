@@ -1,10 +1,12 @@
 import os
 os.environ['QT_API'] = 'pyside'
 
+import numpy
 import matplotlib
 matplotlib.use('Qt4Agg')
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.colors as colors
 
 import matplotlib.pyplot as plt
 from PySide import QtCore, QtGui
@@ -27,3 +29,71 @@ class matplotlibCanvas(FigureCanvas):
            
         FigureCanvas.setSizePolicy(self, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+
+class Plot(QtGui.QWidget):
+    def __init__(self, simulation, parent=None):
+        # call base class constructor
+        super(Plot, self).__init__()
+
+        # save simulation
+        self.simulation = simulation
+        self.step = 0
+        self.simulationHistory = [numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
+
+        # create timer 
+        self.init_timer()
+
+        # create canvas
+        self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
+        self.im = self.canvas.axes.imshow(numpy.fabs(self.simulation.field.oddFieldX['field']), norm=colors.Normalize(0.0, 10.0), extent=[0.0, self.simulation.field.xSize, 0.0, self.simulation.field.ySize])
+        self.canvas.axes.grid(True)
+
+        # create layout
+        grid = QtGui.QGridLayout()
+        grid.addWidget(self.canvas)
+        self.setLayout(grid)
+
+        # plot once
+        self.update()
+
+    def update(self):
+        # cummulate all layer masks
+        self.masks = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
+
+        # get electric layer
+        for fX, fY, dX, dY, mask in self.simulation.material['electric'].layer:
+            self.masks += mask
+        
+        #self.masks = numpy.where(self.masks < 1.0, self.masks, 1.0)
+
+        # plot
+        self.plot()
+
+    def plot(self):
+        # plot
+        self.im.set_array(self.masks + self.simulationHistory[self.step])
+
+        print 'plot'
+
+        # update canvas
+        self.canvas.draw()
+
+    def init_timer(self):
+        # timer function
+        def timeout():
+            # increment step
+            self.step += 1
+            if self.step >= len(self.simulationHistory):
+                self.step = 0
+
+        # create timer
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.plot)
+        self.timer.timeout.connect(timeout)
+            
+    def show_simulation(self, simulationHistory):
+        # save history
+        self.simulationHistory = simulationHistory
+
+        # start timer
+        self.timer.start(50)

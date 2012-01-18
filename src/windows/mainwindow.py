@@ -14,10 +14,6 @@ class MainWindow(QtGui.QMainWindow):
         # init simulation
         self.simulation = solver(field(0.4, 0.4, 0.001))
 
-        # init timer
-        self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.plot)
-
         # initialize gui elements
         self.create_actions()
         self.init_gui()
@@ -35,6 +31,9 @@ class MainWindow(QtGui.QMainWindow):
         # create Container
         self.container = QtGui.QWidget(self)
         self.setCentralWidget(self.container)
+
+        # create Plot
+        self.plot = Plot(self.simulation)
 
         # create matplotlib plot
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='bla')
@@ -69,12 +68,16 @@ class MainWindow(QtGui.QMainWindow):
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
         self.treeWidget.addTopLevelItems(self.layerItems)
 
+        # add PML layer
+        QtGui.QTreeWidgetItem(self.layerItems[0], ['PML', '', ''])
+        QtGui.QTreeWidgetItem(self.layerItems[1], ['PML', '', ''])
+
         treeGrid.addWidget(treeLabel, 0, 0)
         treeGrid.addWidget(self.treeWidget, 1, 0)
 
         # layout
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.canvas, 0, 0)
+        grid.addWidget(self.plot, 0, 0)
         grid.addWidget(startSimButton, 1, 0)
         grid.addWidget(newLayerButton, 1, 1)
         grid.addLayout(treeGrid, 0, 1)
@@ -116,6 +119,9 @@ class MainWindow(QtGui.QMainWindow):
             QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
             self.simulation.source[mask_from_string(mask)] = source_from_string(function)
 
+        # update plot
+        self.plot.update()
+
     def run_simulation(self):
         # progress function
         self.simulationHistory = []
@@ -135,22 +141,8 @@ class MainWindow(QtGui.QMainWindow):
         # finish function
         def finish():
             # start timer
-            self.timer.start(50)
+            self.plot.show_simulation(self.simulationHistory)
             print 'finish'
 
         # run simulation
-        self.simulation.solve(duration, progressfunction=progress, finishfunction=finish)
-
-    def plot(self):
-        if not hasattr(self, 'step'):
-            self.step = 0
-        
-        # plot current image
-        self.im.set_array(self.simulationHistory[self.step])
-
-        # increment step
-        self.step += 1
-        if self.step >= len(self.simulationHistory):
-            self.step = 0
-
-        self.canvas.draw()
+        self.simulation.solve(duration, progressfunction=progress, finishfunction=finish) 
