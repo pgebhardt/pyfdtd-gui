@@ -24,9 +24,9 @@ class NewLayer(QtGui.QWidget):
         self.okButton = QtGui.QPushButton('OK')
         buttonGrid.addWidget(self.okButton, 0, 0)
 
-        cancleButton = QtGui.QPushButton('cancle')
-        cancleButton.clicked.connect(self.close)
-        buttonGrid.addWidget(cancleButton, 0, 1)
+        cancelButton = QtGui.QPushButton('cancel')
+        cancelButton.clicked.connect(self.close)
+        buttonGrid.addWidget(cancelButton, 0, 1)
 
         # create edits
         self.nameEdit = QtGui.QLineEdit()

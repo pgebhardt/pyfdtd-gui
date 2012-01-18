@@ -24,8 +24,8 @@ class MainWindow(QtGui.QMainWindow):
         self.resize(1000, 600)        
         
         # create menu bar
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
+        fileMenu = self.menuBar().addMenu('&File')
+        fileMenu.addAction(self.settingsAction)
         fileMenu.addAction(self.exitAction)
 
         # create Container
@@ -34,10 +34,6 @@ class MainWindow(QtGui.QMainWindow):
 
         # create Plot
         self.plot = Plot(self.simulation)
-
-        # create matplotlib plot
-        self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='bla')
-        self.im = self.canvas.axes.imshow(numpy.fabs(self.simulation.field.oddFieldX['field']), norm=colors.Normalize(0.0, 10.0))
 
         # create button
         startSimButton = QtGui.QPushButton('start simulation')
@@ -84,17 +80,22 @@ class MainWindow(QtGui.QMainWindow):
         self.container.setLayout(grid)
 
     def create_actions(self):
-        # exit action
-        self.exitAction = QtGui.QAction('&Exit', self)
-        self.exitAction.setShortcut('Ctrl+Q')
-        self.exitAction.setStatusTip('Exit application')
-        self.exitAction.triggered.connect(self.close)
+        # settings action
+        self.settingsAction = QtGui.QAction('&Settings', self, statusTip='Set domain size', triggered=self.update_settings)
 
-    def update_tree(self):
-        QtGui.QTreeWidgetItem(topItems[-1], ['Radar 1', 'sin(2.0*pi*x)'])
-        QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 1', 'blupp'])
-        QtGui.QTreeWidgetItem(topItems[0], ['Kupfer 2', 'bla'])
-        QtGui.QTreeWidgetItem(topItems[1], ['Magnet', 'kreis'])
+        # exit action
+        self.exitAction = QtGui.QAction('&Exit', self, shortcut='Ctrl+Q', statusTip='Exit application', triggered=self.close)
+
+    def update_settings(self):
+        # new settings callback
+        def new_settings(xSize, ySize, deltaX, deltaY):
+            self.simulation = solver(field(xSize, ySize, deltaX, seltaY))
+            self.plot.simulation = self.simulation
+            self.plot.update()
+
+        # create dialog
+        self.settingsDialog = dialogs.Settings()
+        self.settingsDialog.show()
 
     def new_layer(self):
         # close dialog
