@@ -91,6 +91,10 @@ class MainWindow(QtGui.QMainWindow):
         # exit action
         self.exitAction = QtGui.QAction('&Exit', self, shortcut='Ctrl+Q', statusTip='Exit application', triggered=self.close)
 
+    def closeEvent(self, event):
+        # close eval window
+        self.evalWindow.close()
+
     def new_simulation(self):
         # new simulation callback
         def new_simulation():
@@ -159,7 +163,7 @@ class MainWindow(QtGui.QMainWindow):
     def run_simulation(self):
         # progress function
         self.simulationHistory = []
-        duration = 1.0e-9
+        duration = 5.0e-9
         def progress(t, deltaT, field):
             xShape, yShape = field.oddFieldX['flux'].shape
             interval = xShape*yShape*duration/(256e6/4.0)

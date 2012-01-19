@@ -2,6 +2,7 @@ from PySide import QtGui, QtCore
 from plot import *
 from numpy import *
 from scipy import *
+from scipy.signal import *
 from math import *
 
 class EvalWindow(QtGui.QMainWindow):
@@ -51,8 +52,7 @@ class EvalWindow(QtGui.QMainWindow):
         listener = self.simulation.listener
 
         # evaluate
-        for string in inputText.splitlines():
-            eval(string)
+        exec(inputText)
 
         # draw plot
         self.plot.draw()
