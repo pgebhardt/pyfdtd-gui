@@ -80,6 +80,7 @@ class MainWindow(QtGui.QMainWindow):
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
+        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Listener']))
         self.treeWidget.addTopLevelItems(self.layerItems)
 
         # add PML layer
@@ -144,9 +145,15 @@ class MainWindow(QtGui.QMainWindow):
             elif type_ == 'Source':
                 self.simulation.source[mask_from_string(mask)] = source_from_string(function)
                 QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
+            elif type_ == 'Listener':
+                x, y = float(self.newLayerDialog.xEdit.text()), float(self.newLayerDialog.yEdit.text())
+                self.simulation.listener.append(listener(x, y))
+                QtGui.QTreeWidgetItem(self.layerItems[3], [name, 'x={}, y={}'.format(x, y)])
         except SyntaxError:
             return
         except NameError:
+            return
+        except ValueError:
             return
 
         # update plot

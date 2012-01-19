@@ -61,19 +61,39 @@ class Plot(QtGui.QWidget):
 
         # cummulate all layer masks
         self.masks = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
+        self.sources = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
+        self.listener = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
 
         # get electric layer
-        for fX, fY, dX, dY, mask in self.simulation.material['electric'].layer[1:]:
+        for fX, fY, dX, dY, mask in self.simulation.material['electric'].layer[2:]:
             self.masks += mask
         
-        self.masks *= 1.0/numpy.max(self.masks)
+        # get magnetic layer
+        for fX, fY, dX, dY, mask in self.simulation.material['magnetic'].layer[2:]:
+            self.masks += mask
+
+        # get sources
+        for fX, fY, dX, dY, mask in self.simulation.source.layer:
+            self.sources += mask
+
+        # get listener
+        for listener in self.simulation.listener:
+            x, y = listener.pos
+            print x, y
+            self.listener[x/self.simulation.field.deltaX, y/self.simulation.field.deltaY] = 5.0
+
+        # norm masks 
+        if numpy.max(self.masks) != 0.0:
+            self.masks *= 1.0/numpy.max(self.masks)
+        if numpy.max(self.sources) != 0.0:
+            self.sources *= 10.0/numpy.max(self.sources)
 
         # plot
         self.plot()
 
     def plot(self):
         # plot
-        self.im.set_array(self.masks + self.simulationHistory[self.step])
+        self.im.set_array(self.masks + self.sources + self.listener + self.simulationHistory[self.step])
 
         # update canvas
         self.canvas.draw()
