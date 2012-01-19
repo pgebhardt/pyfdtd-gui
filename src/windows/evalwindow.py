@@ -51,6 +51,9 @@ class EvalWindow(QtGui.QMainWindow):
         canvas = self.plot
         listener = self.simulation.listener
 
+        # clear axes
+        plot.cla()
+
         # evaluate
         exec(inputText)
 
