@@ -4,6 +4,7 @@ from pyfdtd import *
 from plugins import *
 from plot import *
 import dialogs
+from evalwindow import *
 
 # Main window for pyfdtd-gui application
 class MainWindow(QtGui.QMainWindow):
@@ -83,10 +84,6 @@ class MainWindow(QtGui.QMainWindow):
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Listener']))
         self.treeWidget.addTopLevelItems(self.layerItems)
 
-        # add PML layer
-        QtGui.QTreeWidgetItem(self.layerItems[0], ['PML', '', ''])
-        QtGui.QTreeWidgetItem(self.layerItems[1], ['PML', '', ''])
-        
     def create_actions(self):
         # settings action
         self.newAction = QtGui.QAction('&New', self, shortcut='Ctrl+N', statusTip='New simulation', triggered=self.new_simulation)
@@ -162,7 +159,7 @@ class MainWindow(QtGui.QMainWindow):
     def run_simulation(self):
         # progress function
         self.simulationHistory = []
-        duration = 5.0e-9
+        duration = 1.0e-9
         def progress(t, deltaT, field):
             xShape, yShape = field.oddFieldX['flux'].shape
             interval = xShape*yShape*duration/(256e6/4.0)
@@ -179,6 +176,10 @@ class MainWindow(QtGui.QMainWindow):
         def finish():
             # start timer
             self.plot.show_simulation(self.simulationHistory)
+
+            # open eval window
+            self.evalWindow = EvalWindow(self.simulation)
+            self.evalWindow.show()
 
         # run simulation
         self.simulation.solve(duration, progressfunction=progress, finishfunction=finish) 
