@@ -5,6 +5,7 @@ from scipy import *
 from scipy.signal import *
 from math import *
 
+
 class EvalWindow(QtGui.QMainWindow):
     def __init__(self, simulation):
         # call base class constructor
@@ -24,15 +25,15 @@ class EvalWindow(QtGui.QMainWindow):
         # create container
         self.container = QtGui.QWidget(self)
         self.setCentralWidget(self.container)
-        
+
         # create plot
         self.plot = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Listener')
-        
+
         # create input
         self.inputEdit = QtGui.QTextEdit()
 
         # create button
-        self.evalButton = QtGui.QPushButton('Eval')
+        self.evalButton = QtGui.QPushButton('Plot')
         self.evalButton.clicked.connect(self.evaluate)
 
         # create layout
@@ -45,7 +46,7 @@ class EvalWindow(QtGui.QMainWindow):
     def evaluate(self):
         # get input
         inputText = self.inputEdit.toPlainText()
-        
+
         # create propper environment
         plot = self.plot.axes
         canvas = self.plot

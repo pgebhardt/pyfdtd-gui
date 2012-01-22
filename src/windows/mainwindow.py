@@ -22,8 +22,8 @@ class MainWindow(QtGui.QMainWindow):
     def init_gui(self):
         # set window title
         self.setWindowTitle('Pyfdtd GUI')
-        self.resize(1000, 600)        
-        
+        self.resize(1000, 600)
+
         # create menu bar
         fileMenu = self.menuBar().addMenu('&File')
         fileMenu.addAction(self.newAction)
@@ -93,7 +93,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def closeEvent(self, event):
         # close eval window
-        self.evalWindow.close()
+        if hasattr(self, 'evalWindow'):
+            self.evalWindow.close()
 
     def new_simulation(self):
         # new simulation callback
