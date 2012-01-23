@@ -15,12 +15,18 @@ class EvalWindow(QtGui.QMainWindow):
         self.simulation = simulation
 
         # initialize gui
+        self.create_actions()
         self.init_gui()
 
     def init_gui(self):
         # set window title
         self.setWindowTitle('PyFDTD GUI - Eval')
         self.resize(1000, 600)
+
+        # create file menu
+        fileMenu = self.menuBar().addMenu('&File')
+        fileMenu.addAction(self.openAction)
+        fileMenu.addAction(self.saveAction)
 
         # create container
         self.container = QtGui.QWidget(self)
@@ -42,6 +48,38 @@ class EvalWindow(QtGui.QMainWindow):
         root.addWidget(self.inputEdit, 0, 1)
         root.addWidget(self.evalButton, 1, 1)
         self.container.setLayout(root)
+
+    def create_actions(self):
+        # open script action
+        self.openAction = QtGui.QAction('&Open', self, shortcut='Ctrl+O',
+                statusTip='Open script', triggered=self.open_script)
+
+        # save script action
+        self.saveAction = QtGui.QAction('&Save', self, shortcut='Ctrl+S',
+                statusTip='Save script', triggered=self.save_script)
+
+    def open_script(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open script')
+
+        # open file
+        f = open(fname, 'r')
+
+        # load data
+        with f:
+            data = f.read()
+            self.inputEdit.setText(data)
+
+    def save_script(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save script')
+
+        # open file
+        f = open(fname, 'w')
+
+        # save data
+        with f:
+            f.write(self.inputEdit.toPlainText())
 
     def evaluate(self):
         # get input
