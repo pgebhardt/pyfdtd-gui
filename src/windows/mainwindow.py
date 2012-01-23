@@ -166,7 +166,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # update tree
         self.treeWidget.clear()
-        self.treeWidget.addLayerItems(self.layerItems)
+        self.treeWidget.addTopLevelItems(self.layerItems)
 
         # close file
         f.close()
