@@ -93,7 +93,6 @@ class Plot(QtGui.QWidget):
         # get listener
         for listener in self.simulation.listener:
             x, y = listener.pos
-            print x, y
             self.listener[x / self.simulation.field.deltaX,
                     y / self.simulation.field.deltaY] = 5.0
 

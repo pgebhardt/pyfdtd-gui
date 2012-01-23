@@ -203,32 +203,35 @@ class MainWindow(QtGui.QMainWindow):
                 er, sigma = (float(self.newLayerDialog.rEdit.text()),
                         float(self.newLayerDialog.sigmaEdit.text()))
                 self.simulation.material['electric'][
-                        mask_from_string(mask)
-                        ] = material.epsilon(er=er, sigma=sigma)
+                        mask_from_string(mask)] = \
+                                material.epsilon(er=er, sigma=sigma)
                 QtGui.QTreeWidgetItem(self.layerItems[0],
                         [name, mask,
                             'epsilon(er={}, sigma={})'.format(er, sigma)])
+
             elif type_ == 'Magnetic':
                 mur, sigma = (float(self.newLayerDialog.rEdit.text()),
                         float(self.newLayerDialog.sigmaEdit.text()))
                 self.simulation.material['electric'][
-                        mask_from_string(mask)
-                        ] = material.mu(mur=mur, sigma=sigma)
+                        mask_from_string(mask)] = \
+                                material.mu(mur=mur, sigma=sigma)
                 QtGui.QTreeWidgetItem(self.layerItems[0],
                         [name, mask,
                             'mu(mur={}, sigma={})'.format(mur, sigma)])
+
             elif type_ == 'Source':
                 self.simulation.source[
-                        mask_from_string(mask)
-                        ] = source_from_string(function)
+                        mask_from_string(mask)] = source_from_string(function)
                 QtGui.QTreeWidgetItem(self.layerItems[2],
                         [name, mask, function])
+
             elif type_ == 'Listener':
                 x, y = (float(self.newLayerDialog.xEdit.text()),
                         float(self.newLayerDialog.yEdit.text()))
                 self.simulation.listener.append(listener(x, y))
                 QtGui.QTreeWidgetItem(self.layerItems[3],
                         [name, 'x={}, y={}'.format(x, y)])
+
         except SyntaxError:
             return
         except NameError:
