@@ -1,5 +1,6 @@
 from PySide import QtCore, QtGui
 import matplotlib.colors as colors
+import pickle
 from pyfdtd import *
 from plugins import *
 from plot import *
@@ -27,8 +28,10 @@ class MainWindow(QtGui.QMainWindow):
 
         # create menu bar
         fileMenu = self.menuBar().addMenu('&File')
-        fileMenu.addAction(self.newAction)
-        fileMenu.addAction(self.exitAction)
+
+        # add actions
+        for action in self.actions:
+            fileMenu.addAction(action)
 
         # create Container
         self.container = QtGui.QWidget(self)
@@ -86,15 +89,24 @@ class MainWindow(QtGui.QMainWindow):
         self.treeWidget.addTopLevelItems(self.layerItems)
 
     def create_actions(self):
-        # settings action
-        self.newAction = QtGui.QAction('&New', self,
-                shortcut='Ctrl+N', statusTip='New simulation',
-                triggered=self.new_simulation)
+        # create action list
+        self.actions = []
+
+        # new simulation action
+        self.actions.append(QtGui.QAction('&New', self, shortcut='Ctrl+N',
+            statusTip='New simulation', triggered=self.new_simulation))
+
+        # open simulation action
+        self.actions.append(QtGui.QAction('&Open', self, shortcut='Ctrl+O',
+                statusTip='Open simulation', triggered=self.open_simulation))
+
+        # save simulation action
+        self.actions.append(QtGui.QAction('&Save', self, shortcut='Ctrl+S',
+                statusTip='Save simulation', triggered=self.save_simulation))
 
         # exit action
-        self.exitAction = QtGui.QAction('&Exit', self,
-                shortcut='Ctrl+Q', statusTip='Exit application',
-                triggered=self.close)
+        self.actions.append(QtGui.QAction('&Exit', self, shortcut='Ctrl+Q',
+            statusTip='Exit application', triggered=self.close))
 
     def closeEvent(self, event):
         # close eval window
@@ -138,6 +150,42 @@ class MainWindow(QtGui.QMainWindow):
 
         # show dialog
         self.newSimDialog.show()
+
+    def open_simulation(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open simulation')
+
+        # open file
+        f = open(fname, 'rb')
+
+        # unpickle simulation
+        self.simulation = pickle.load(f)
+
+        # unpickle tree
+        self.layerItems = pickle.load(f)
+
+        # update tree
+        self.treeWidget.clear()
+        self.treeWidget.addLayerItems(self.layerItems)
+
+        # close file
+        f.close()
+
+    def save_simulation(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save simulation')
+
+        # open file
+        f = open(fname, 'wb')
+
+        # pickle simulation
+        pickle.dump(self.simulation, f)
+
+        # pickle Tree
+        pickle.dump(self.layerItems, f)
+
+        # close file
+        f.close()
 
     def new_layer(self):
         # close dialog
