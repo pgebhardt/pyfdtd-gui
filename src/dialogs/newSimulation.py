@@ -1,5 +1,6 @@
 from PySide import QtGui, QtCore
 
+
 class NewSimulation(QtGui.QWidget):
     def __init__(self, mainWindow=None):
         # call base class constructor

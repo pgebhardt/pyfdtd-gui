@@ -1,5 +1,6 @@
 from PySide import QtGui, QtCore
 
+
 class NewLayer(QtGui.QWidget):
     def __init__(self, mainWindow=None):
         # call base class constructor
@@ -31,7 +32,8 @@ class NewLayer(QtGui.QWidget):
         # create edits
         self.nameEdit = QtGui.QLineEdit()
         self.typeComboBox = QtGui.QComboBox()
-        self.typeComboBox.addItems(['Electric', 'Magnetic', 'Source', 'Listener'])
+        self.typeComboBox.addItems(['Electric', 'Magnetic',
+                                    'Source', 'Listener'])
         self.typeComboBox.currentIndexChanged.connect(self.update_gui)
         self.maskEdit = QtGui.QLineEdit()
         self.rEdit = QtGui.QLineEdit()

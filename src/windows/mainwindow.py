@@ -6,6 +6,7 @@ from plot import *
 import dialogs
 from evalwindow import *
 
+
 # Main window for pyfdtd-gui application
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
@@ -86,10 +87,14 @@ class MainWindow(QtGui.QMainWindow):
 
     def create_actions(self):
         # settings action
-        self.newAction = QtGui.QAction('&New', self, shortcut='Ctrl+N', statusTip='New simulation', triggered=self.new_simulation)
+        self.newAction = QtGui.QAction('&New', self,
+                shortcut='Ctrl+N', statusTip='New simulation',
+                triggered=self.new_simulation)
 
         # exit action
-        self.exitAction = QtGui.QAction('&Exit', self, shortcut='Ctrl+Q', statusTip='Exit application', triggered=self.close)
+        self.exitAction = QtGui.QAction('&Exit', self,
+                shortcut='Ctrl+Q', statusTip='Exit application',
+                triggered=self.close)
 
     def closeEvent(self, event):
         # close eval window
@@ -103,23 +108,33 @@ class MainWindow(QtGui.QMainWindow):
             self.newSimDialog.close()
 
             # update simulation
-            self.simulation = solver(field(float(self.newSimDialog.xSizeEdit.text()), float(self.newSimDialog.ySizeEdit.text()), float(self.newSimDialog.deltaYEdit.text()), float(self.newSimDialog.deltaYEdit.text())))
+            self.simulation = solver(field(
+                float(self.newSimDialog.xSizeEdit.text()),
+                float(self.newSimDialog.ySizeEdit.text()),
+                float(self.newSimDialog.deltaYEdit.text()),
+                float(self.newSimDialog.deltaYEdit.text())))
             self.plot.simulation = self.simulation
-            self.plot.simulationHistory = [numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
+            self.plot.simulationHistory = [
+                    numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
+                    ]
             self.plot.update()
 
             # init tree
             self.init_tree()
-            
+
         # create dialog
         self.newSimDialog = dialogs.NewSimulation()
         self.newSimDialog.okButton.clicked.connect(new_simulation)
 
         # set settings
-        self.newSimDialog.xSizeEdit.setText('{}'.format(self.simulation.field.xSize))
-        self.newSimDialog.ySizeEdit.setText('{}'.format(self.simulation.field.ySize))
-        self.newSimDialog.deltaXEdit.setText('{}'.format(self.simulation.field.deltaX))
-        self.newSimDialog.deltaYEdit.setText('{}'.format(self.simulation.field.deltaY))
+        self.newSimDialog.xSizeEdit.setText(
+                '{}'.format(self.simulation.field.xSize))
+        self.newSimDialog.ySizeEdit.setText(
+                '{}'.format(self.simulation.field.ySize))
+        self.newSimDialog.deltaXEdit.setText(
+                '{}'.format(self.simulation.field.deltaX))
+        self.newSimDialog.deltaYEdit.setText(
+                '{}'.format(self.simulation.field.deltaY))
 
         # show dialog
         self.newSimDialog.show()
@@ -137,20 +152,35 @@ class MainWindow(QtGui.QMainWindow):
         # create layer
         try:
             if type_ == 'Electric':
-                er, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
-                self.simulation.material['electric'][mask_from_string(mask)] = material.epsilon(er=er, sigma=sigma)
-                QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
+                er, sigma = (float(self.newLayerDialog.rEdit.text()),
+                        float(self.newLayerDialog.sigmaEdit.text()))
+                self.simulation.material['electric'][
+                        mask_from_string(mask)
+                        ] = material.epsilon(er=er, sigma=sigma)
+                QtGui.QTreeWidgetItem(self.layerItems[0],
+                        [name, mask,
+                            'epsilon(er={}, sigma={})'.format(er, sigma)])
             elif type_ == 'Magnetic':
-                mur, sigma = float(self.newLayerDialog.rEdit.text()), float(self.newLayerDialog.sigmaEdit.text())
-                self.simulation.material['electric'][mask_from_string(mask)] = material.mu(mur=mur, sigma=sigma)
-                QtGui.QTreeWidgetItem(self.layerItems[0], [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
+                mur, sigma = (float(self.newLayerDialog.rEdit.text()),
+                        float(self.newLayerDialog.sigmaEdit.text()))
+                self.simulation.material['electric'][
+                        mask_from_string(mask)
+                        ] = material.mu(mur=mur, sigma=sigma)
+                QtGui.QTreeWidgetItem(self.layerItems[0],
+                        [name, mask,
+                            'mu(mur={}, sigma={})'.format(mur, sigma)])
             elif type_ == 'Source':
-                self.simulation.source[mask_from_string(mask)] = source_from_string(function)
-                QtGui.QTreeWidgetItem(self.layerItems[2], [name, mask, function])
+                self.simulation.source[
+                        mask_from_string(mask)
+                        ] = source_from_string(function)
+                QtGui.QTreeWidgetItem(self.layerItems[2],
+                        [name, mask, function])
             elif type_ == 'Listener':
-                x, y = float(self.newLayerDialog.xEdit.text()), float(self.newLayerDialog.yEdit.text())
+                x, y = (float(self.newLayerDialog.xEdit.text()),
+                        float(self.newLayerDialog.yEdit.text()))
                 self.simulation.listener.append(listener(x, y))
-                QtGui.QTreeWidgetItem(self.layerItems[3], [name, 'x={}, y={}'.format(x, y)])
+                QtGui.QTreeWidgetItem(self.layerItems[3],
+                        [name, 'x={}, y={}'.format(x, y)])
         except SyntaxError:
             return
         except NameError:
@@ -165,17 +195,19 @@ class MainWindow(QtGui.QMainWindow):
         # progress function
         self.simulationHistory = []
         duration = 5.0e-9
+
         def progress(t, deltaT, field):
             xShape, yShape = field.oddFieldX['flux'].shape
-            interval = xShape*yShape*duration/(256e6/4.0)
+            interval = xShape * yShape * duration / (256e6 / 4.0)
 
             # save history
-            if t/deltaT % (interval/deltaT) < 1.0:
-                self.simulationHistory.append(field.oddFieldX['field'] + field.oddFieldY['field'])
-            
+            if t / deltaT % (interval / deltaT) < 1.0:
+                self.simulationHistory.append(field.oddFieldX['field']
+                        + field.oddFieldY['field'])
+
             # print progess
-            if t/deltaT % 100 < 1.0:
-                print '{}'.format(t*100.0/duration)
+            if t / deltaT % 100 < 1.0:
+                print '{}'.format(t * 100.0 / duration)
 
         # finish function
         def finish():
@@ -187,4 +219,5 @@ class MainWindow(QtGui.QMainWindow):
             self.evalWindow.show()
 
         # run simulation
-        self.simulation.solve(duration, progressfunction=progress, finishfunction=finish) 
+        self.simulation.solve(duration,
+                progressfunction=progress, finishfunction=finish)

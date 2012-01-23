@@ -4,31 +4,34 @@ os.environ['QT_API'] = 'pyside'
 import numpy
 import matplotlib
 matplotlib.use('Qt4Agg')
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg \
+        import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
 import matplotlib.pyplot as plt
 from PySide import QtCore, QtGui
 
-class matplotlibCanvas(FigureCanvas):       
+
+class matplotlibCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
     def __init__(self, parent=None, width=8, height=4, dpi=100, title=None):
-        
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
-                    
+
         # We want the axes cleared every time plot() is called
         self.axes.hold(False)
-                   
+
         if title != None:
             fig.suptitle(title, fontsize=12)
-           
+
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
-           
-        FigureCanvas.setSizePolicy(self, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+        FigureCanvas.setSizePolicy(self, QtGui.QSizePolicy.Expanding,
+                QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+
 
 class Plot(QtGui.QWidget):
     def __init__(self, simulation, parent=None):
@@ -38,9 +41,11 @@ class Plot(QtGui.QWidget):
         # save simulation
         self.simulation = simulation
         self.step = 0
-        self.simulationHistory = [numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
+        self.simulationHistory = [
+                numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
+                ]
 
-        # create timer 
+        # create timer
         self.init_timer()
 
         # create canvas
@@ -56,20 +61,29 @@ class Plot(QtGui.QWidget):
 
     def update(self):
         # redraw im
-        self.im = self.canvas.axes.imshow(numpy.fabs(self.simulation.field.oddFieldX['field']), norm=colors.Normalize(0.0, 10.0), extent=[0.0, self.simulation.field.ySize, self.simulation.field.xSize, 0.0])
+        self.im = self.canvas.axes.imshow(
+                numpy.fabs(self.simulation.field.oddFieldX['field']),
+                norm=colors.Normalize(0.0, 10.0),
+                extent=[0.0, self.simulation.field.ySize,
+                    self.simulation.field.xSize, 0.0])
         self.canvas.axes.grid(True)
 
         # cummulate all layer masks
-        self.masks = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
-        self.sources = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
-        self.listener = numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
+        self.masks = numpy.zeros(
+                self.simulation.field.oddFieldX['field'].shape)
+        self.sources = numpy.zeros(
+                self.simulation.field.oddFieldX['field'].shape)
+        self.listener = numpy.zeros(
+                self.simulation.field.oddFieldX['field'].shape)
 
         # get electric layer
-        for fX, fY, dX, dY, mask in self.simulation.material['electric'].layer[2:]:
+        layer = self.simulation.material['electric'].layer[2:]
+        for fX, fY, dX, dY, mask in layer:
             self.masks += mask
-        
+
         # get magnetic layer
-        for fX, fY, dX, dY, mask in self.simulation.material['magnetic'].layer[2:]:
+        layer = self.simulation.material['magnetic'].layer[2:]
+        for fX, fY, dX, dY, mask in layer:
             self.masks += mask
 
         # get sources
@@ -80,20 +94,22 @@ class Plot(QtGui.QWidget):
         for listener in self.simulation.listener:
             x, y = listener.pos
             print x, y
-            self.listener[x/self.simulation.field.deltaX, y/self.simulation.field.deltaY] = 5.0
+            self.listener[x / self.simulation.field.deltaX,
+                    y / self.simulation.field.deltaY] = 5.0
 
-        # norm masks 
+        # norm masks
         if numpy.max(self.masks) != 0.0:
-            self.masks *= 1.0/numpy.max(self.masks)
+            self.masks *= 1.0 / numpy.max(self.masks)
         if numpy.max(self.sources) != 0.0:
-            self.sources *= 10.0/numpy.max(self.sources)
+            self.sources *= 10.0 / numpy.max(self.sources)
 
         # plot
         self.plot()
 
     def plot(self):
         # plot
-        self.im.set_array(self.masks + self.sources + self.listener + self.simulationHistory[self.step])
+        self.im.set_array(self.masks + self.sources +
+                self.listener + self.simulationHistory[self.step])
 
         # update canvas
         self.canvas.draw()
@@ -110,7 +126,7 @@ class Plot(QtGui.QWidget):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.plot)
         self.timer.timeout.connect(timeout)
-            
+
     def show_simulation(self, simulationHistory):
         # save history
         self.simulationHistory = simulationHistory

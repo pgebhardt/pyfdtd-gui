@@ -1,1 +1,1 @@
-from functionparser import * 
+from functionparser import *
