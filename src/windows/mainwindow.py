@@ -5,6 +5,7 @@ from pyfdtd import *
 from plugins import *
 from plot import *
 import dialogs
+import jobs
 from evalwindow import *
 
 
@@ -155,37 +156,57 @@ class MainWindow(QtGui.QMainWindow):
         # open dialog
         fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open simulation')
 
-        # open file
-        f = open(fname, 'rb')
+        # load job
+        job = jobs.Job()
+        job.load(fname)
 
-        # unpickle simulation
-        self.simulation = pickle.load(f)
+        # create new simulation
+        xSize, ySize = job.config['size']
+        deltaX, deltaY = job.config['delta']
 
-        # unpickle tree
-        self.layerItems = pickle.load(f)
+        self.simulation = solver(field(xSize, ySize, deltaX, deltaY))
 
-        # update tree
-        self.treeWidget.clear()
-        self.treeWidget.addTopLevelItems(self.layerItems)
+        # init tree
+        self.init_tree()
 
-        # close file
-        f.close()
+        # update materials
+        for name, mask, er, sigma in job.material['electric']:
+            self.simulation['electric'][mask_from_string(mask)] = \
+                material.epsilon(er=er, sigma=sigma)
+            QtGui.QTreeWidgetItem(self.layerItems[0],
+                    [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
+
+        for name, mask, mur, sigma in job.material['magnetic']:
+            self.simulation['magnetic'][mask_from_string(mask)] = \
+                material.mu(mur=mur, sigma=sigma)
+            QtGui.QTreeWidgetItem(self.layerItems[1],
+                    [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
+
+        # update sources
+        for name, mask, function in job.source:
+            self.simulation.source[mask_from_string(mask)] = \
+                    source_from_string(function)
+            QtGui.QTreeWidgetItem(self.layerItem[2],
+                    [name, mask, function])
+
+        # update listener
+        for name, x, y in job.listener:
+            self.simulation.listener.append(listener(x, y))
+            QtGui.QTreeWidgetItem(self.layerItem[3],
+                    [name, 'x={}, y={}'.format(x, y)])
+
+        # update plot
+        self.plot.update()
 
     def save_simulation(self):
         # open dialog
         fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save simulation')
 
-        # open file
-        f = open(fname, 'wb')
+        # create job
+        job = jobs.Job()
 
-        # pickle simulation
-        pickle.dump(self.simulation, f)
-
-        # pickle Tree
-        pickle.dump(self.layerItems, f)
-
-        # close file
-        f.close()
+        # save job
+        job.save(fname)
 
     def new_layer(self):
         # close dialog
@@ -215,7 +236,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.simulation.material['electric'][
                         mask_from_string(mask)] = \
                                 material.mu(mur=mur, sigma=sigma)
-                QtGui.QTreeWidgetItem(self.layerItems[0],
+                QtGui.QTreeWidgetItem(self.layerItems[1],
                         [name, mask,
                             'mu(mur={}, sigma={})'.format(mur, sigma)])
 

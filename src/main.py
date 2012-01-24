@@ -13,5 +13,3 @@ evalWindow = windows.EvalWindow(None)
 evalWindow.show()
 
 sys.exit(app.exec_())
-
-# TODO
