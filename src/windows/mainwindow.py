@@ -17,6 +17,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # init simulation
         self.simulation = solver(field(0.4, 0.4, 0.001))
+        self.job = jobs.Job()
 
         # initialize gui elements
         self.create_actions()
@@ -61,6 +62,7 @@ class MainWindow(QtGui.QMainWindow):
 
         self.treeWidget = QtGui.QTreeWidget()
         self.treeWidget.setHeaderLabels(['Name', 'Mask', 'Function'])
+        self.treeWidget.setColumnCount(3)
         treeLabel.setBuddy(self.treeWidget)
 
         # init tree
@@ -126,6 +128,15 @@ class MainWindow(QtGui.QMainWindow):
                 float(self.newSimDialog.ySizeEdit.text()),
                 float(self.newSimDialog.deltaYEdit.text()),
                 float(self.newSimDialog.deltaYEdit.text())))
+
+            # update job
+            self.job = jobs.Job()
+            self.job.config['size'] = (self.simulation.field.xSize,
+                    self.simulation.field.ySize)
+            self.job.config['delta'] = (self.simulation.field.deltaX,
+                    self.simulation.field.deltaY)
+
+            # update plot
             self.plot.simulation = self.simulation
             self.plot.simulationHistory = [
                     numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
@@ -157,42 +168,45 @@ class MainWindow(QtGui.QMainWindow):
         fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open simulation')
 
         # load job
-        job = jobs.Job()
-        job.load(fname)
+        self.job.load(fname)
 
         # create new simulation
-        xSize, ySize = job.config['size']
-        deltaX, deltaY = job.config['delta']
+        xSize, ySize = self.job.config['size']
+        deltaX, deltaY = self.job.config['delta']
+        print xSize, ySize, deltaX, deltaY
 
         self.simulation = solver(field(xSize, ySize, deltaX, deltaY))
+        self.plot.simulation = self.simulation
+        self.plot.simulationHistory = [
+                numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
 
         # init tree
         self.init_tree()
 
         # update materials
-        for name, mask, er, sigma in job.material['electric']:
-            self.simulation['electric'][mask_from_string(mask)] = \
+        for name, mask, er, sigma in self.job.material['electric']:
+            self.simulation.material['electric'][mask_from_string(mask)] = \
                 material.epsilon(er=er, sigma=sigma)
             QtGui.QTreeWidgetItem(self.layerItems[0],
                     [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
 
-        for name, mask, mur, sigma in job.material['magnetic']:
-            self.simulation['magnetic'][mask_from_string(mask)] = \
+        for name, mask, mur, sigma in self.job.material['magnetic']:
+            self.simulation.material['magnetic'][mask_from_string(mask)] = \
                 material.mu(mur=mur, sigma=sigma)
             QtGui.QTreeWidgetItem(self.layerItems[1],
                     [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
 
         # update sources
-        for name, mask, function in job.source:
+        for name, mask, function in self.job.source:
             self.simulation.source[mask_from_string(mask)] = \
                     source_from_string(function)
-            QtGui.QTreeWidgetItem(self.layerItem[2],
+            QtGui.QTreeWidgetItem(self.layerItems[2],
                     [name, mask, function])
 
         # update listener
-        for name, x, y in job.listener:
+        for name, x, y in self.job.listener:
             self.simulation.listener.append(listener(x, y))
-            QtGui.QTreeWidgetItem(self.layerItem[3],
+            QtGui.QTreeWidgetItem(self.layerItems[3],
                     [name, 'x={}, y={}'.format(x, y)])
 
         # update plot
@@ -202,11 +216,8 @@ class MainWindow(QtGui.QMainWindow):
         # open dialog
         fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save simulation')
 
-        # create job
-        job = jobs.Job()
-
         # save job
-        job.save(fname)
+        self.job.save(fname)
 
     def new_layer(self):
         # close dialog
@@ -229,6 +240,7 @@ class MainWindow(QtGui.QMainWindow):
                 QtGui.QTreeWidgetItem(self.layerItems[0],
                         [name, mask,
                             'epsilon(er={}, sigma={})'.format(er, sigma)])
+                self.job.material['electric'].append((name, mask, er, sigma))
 
             elif type_ == 'Magnetic':
                 mur, sigma = (float(self.newLayerDialog.rEdit.text()),
@@ -239,12 +251,14 @@ class MainWindow(QtGui.QMainWindow):
                 QtGui.QTreeWidgetItem(self.layerItems[1],
                         [name, mask,
                             'mu(mur={}, sigma={})'.format(mur, sigma)])
+                self.job.material['magnetic'].append((name, mask, mur, sigma))
 
             elif type_ == 'Source':
                 self.simulation.source[
                         mask_from_string(mask)] = source_from_string(function)
                 QtGui.QTreeWidgetItem(self.layerItems[2],
                         [name, mask, function])
+                self.job.source.append((name, mask, function))
 
             elif type_ == 'Listener':
                 x, y = (float(self.newLayerDialog.xEdit.text()),
@@ -252,6 +266,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.simulation.listener.append(listener(x, y))
                 QtGui.QTreeWidgetItem(self.layerItems[3],
                         [name, 'x={}, y={}'.format(x, y)])
+                self.job.listener.append((name, x, y))
 
         except SyntaxError:
             return
