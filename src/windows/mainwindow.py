@@ -173,9 +173,9 @@ class MainWindow(QtGui.QMainWindow):
         # create new simulation
         xSize, ySize = self.job.config['size']
         deltaX, deltaY = self.job.config['delta']
-        print xSize, ySize, deltaX, deltaY
-
         self.simulation = solver(field(xSize, ySize, deltaX, deltaY))
+
+        # update plot
         self.plot.simulation = self.simulation
         self.plot.simulationHistory = [
                 numpy.zeros(self.simulation.field.oddFieldX['field'].shape)]
