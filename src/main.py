@@ -9,4 +9,9 @@ app = QtGui.QApplication(sys.argv)
 mainWindow = windows.MainWindow()
 mainWindow.show()
 
+evalWindow = windows.EvalWindow(None)
+evalWindow.show()
+
 sys.exit(app.exec_())
+
+# TODO
