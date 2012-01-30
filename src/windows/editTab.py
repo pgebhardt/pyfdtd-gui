@@ -1,15 +1,16 @@
 from PySide import QtGui
 from dialogs import NewLayer
 from plot import Plot
+import numpy
 
 
 class EditTab(QtGui.QWidget):
-    def __init__(self, simulation):
+    def __init__(self, mainwindow):
         # call base class constructor
         super(EditTab, self).__init__()
 
-        # save simulation
-        self.simulation = simulation
+        # save mainwindow
+        self.mainwindow = mainwindow
 
         # init gui
         self.init__gui()
@@ -20,15 +21,15 @@ class EditTab(QtGui.QWidget):
         self.setLayout(grid)
 
         # create plot
-        self.plot = Plot(self.simulation)
+        self.plot = Plot(self.mainwindow.simulation)
 
         # create buttons
         startSimButton = QtGui.QPushButton('Start Simulation')
-        startSimButton.clicked.connect(self.run_simulation)
+        startSimButton.clicked.connect(self.mainwindow.run_simulation)
 
         # new layer button
         def new_layer_clicked():
-            self.newLayerDialog = dialogs.NewLayer(mainwindow=self)
+            self.newLayerDialog = dialogs.NewLayer(mainwindow=self.mainwindow)
             self.newLayerDialog.okButton.clicked.connect(self.new_layer)
             self.newLayerDialog.show()
 
@@ -67,33 +68,73 @@ class EditTab(QtGui.QWidget):
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Listener']))
         self.treeWidget.addTopLevelItems(self.layerItems)
 
-    def run_simulation(self):
-        # progress function
-        self.simulationHistory = []
-        duration = 5.0e-9
+    def update(self):
+        # update plot
+        self.plot.simulation = self.mainwindow.simulation
+        self.plot.simulationHistory = [numpy.zeros(
+                    self.mainwindow.simulation.field.oddFieldX['field'].shape)]
+        self.plot.update()
 
-        def progress(t, deltaT, field):
-            xShape, yShape = field.oddFieldX['flux'].shape
-            interval = xShape * yShape * duration / (256e6 / 4.0)
+        # init tree
+        self.init_tree()
 
-            # save history
-            if t / deltaT % (interval / deltaT) < 1.0:
-                self.simulationHistory.append(field.oddFieldX['field']
-                        + field.oddFieldY['field'])
+    def new_layer(self):
+        # close dialog
+        self.newLayerDialog.close()
 
-            # print progess
-            if t / deltaT % 100 < 1.0:
-                print '{}'.format(t * 100.0 / duration)
+        # get attributes
+        name = self.newLayerDialog.nameEdit.text()
+        type_ = self.newLayerDialog.typeComboBox.currentText()
+        mask = self.newLayerDialog.maskEdit.text()
+        function = self.newLayerDialog.functionEdit.text()
 
-        # finish function
-        def finish():
-            # start timer
-            self.plot.show_simulation(self.simulationHistory)
+        # create layer
+        try:
+            if type_ == 'Electric':
+                er, sigma = (float(self.newLayerDialog.rEdit.text()),
+                        float(self.newLayerDialog.sigmaEdit.text()))
+                self.mainwindow.simulation.material['electric'][
+                        mask_from_string(mask)] = \
+                                material.epsilon(er=er, sigma=sigma)
+                QtGui.QTreeWidgetItem(self.layerItems[0],
+                        [name, mask,
+                            'epsilon(er={}, sigma={})'.format(er, sigma)])
+                self.mainwindow.job.material['electric'].append(
+                        (name, mask, er, sigma))
 
-            # open eval window
-            self.evalWindow = EvalWindow(self.simulation)
-            self.evalWindow.show()
+            elif type_ == 'Magnetic':
+                mur, sigma = (float(self.newLayerDialog.rEdit.text()),
+                        float(self.newLayerDialog.sigmaEdit.text()))
+                self.mainwindow.simulation.material['electric'][
+                        mask_from_string(mask)] = \
+                                material.mu(mur=mur, sigma=sigma)
+                QtGui.QTreeWidgetItem(self.layerItems[1],
+                        [name, mask,
+                            'mu(mur={}, sigma={})'.format(mur, sigma)])
+                self.mainwindow.job.material['magnetic'].append(
+                        (name, mask, mur, sigma))
 
-        # run simulation
-        self.simulation.solve(duration,
-                progressfunction=progress, finishfunction=finish)
+            elif type_ == 'Source':
+                self.mainwindow.simulation.source[
+                        mask_from_string(mask)] = source_from_string(function)
+                QtGui.QTreeWidgetItem(self.layerItems[2],
+                        [name, mask, function])
+                self.mainwindow.job.source.append((name, mask, function))
+
+            elif type_ == 'Listener':
+                x, y = (float(self.newLayerDialog.xEdit.text()),
+                        float(self.newLayerDialog.yEdit.text()))
+                self.mainwindow.simulation.listener.append(listener(x, y))
+                QtGui.QTreeWidgetItem(self.layerItems[3],
+                        [name, 'x={}, y={}'.format(x, y)])
+                self.mainwindow.job.listener.append((name, x, y))
+
+        except SyntaxError:
+            return
+        except NameError:
+            return
+        except ValueError:
+            return
+
+        # update plot
+        self.plot.update()
