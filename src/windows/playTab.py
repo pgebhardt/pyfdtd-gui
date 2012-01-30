@@ -37,15 +37,22 @@ class PlayTab(QtGui.QWidget):
         def play_simulation():
             self.timer.start(50)
 
+        def rewind():
+            self.step = 0
+
         self.playButton = QtGui.QPushButton('Play')
         self.playButton.clicked.connect(play_simulation)
         self.playButton.setDisabled(True)
+
+        rewindButton = QtGui.QPushButton('Rewind')
+        rewindButton.clicked.connect(rewind)
 
         stopButton = QtGui.QPushButton('Stop')
         stopButton.clicked.connect(self.timer.stop)
 
         buttonGrid.addWidget(self.playButton, 0, 0)
-        buttonGrid.addWidget(stopButton, 0, 1)
+        buttonGrid.addWidget(rewindButton, 0, 1)
+        buttonGrid.addWidget(stopButton, 0, 2)
 
         # set layout
         grid.addWidget(self.plot, 0, 0)

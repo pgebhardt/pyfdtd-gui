@@ -117,12 +117,14 @@ class MainWindow(QtGui.QMainWindow):
         # show dialog
         self.newSimDialog.show()
 
-    def open_simulation(self):
-        # open dialog
-        fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open simulation')
+    def open_simulation(self, fromFile=True):
+        if fromFile:
+            # open dialog
+            fname, _ = QtGui.QFileDialog.getOpenFileName(
+                    self, 'Open simulation')
 
-        # load job
-        self.job.load(fname)
+            # load job
+            self.job.load(fname)
 
         # create new simulation
         xSize, ySize = self.job.config['size']
