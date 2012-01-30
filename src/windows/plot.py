@@ -9,7 +9,7 @@ from matplotlib.backends.backend_qt4agg \
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
-from PySide import QtCore, QtGui
+from PySide import QtGui
 
 
 class matplotlibCanvas(FigureCanvas):

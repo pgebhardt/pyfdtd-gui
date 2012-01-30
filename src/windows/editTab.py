@@ -1,9 +1,8 @@
 from PySide import QtGui
-from pyfdtd import material, masks, listener, source
-from plugins import *
+from pyfdtd import material, listener
+from plugins import mask_from_string, source_from_string
 import dialogs
 from plot import Plot
-import numpy
 
 
 class EditTab(QtGui.QWidget):

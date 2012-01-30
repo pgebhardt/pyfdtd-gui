@@ -1,4 +1,4 @@
-from PySide import QtGui, QtCore
+from PySide import QtGui
 
 
 class NewLayer(QtGui.QWidget):

@@ -1,8 +1,6 @@
-from PySide import QtCore, QtGui
-import pickle
+from PySide import QtGui
 import pyfdtd
-from plugins import *
-from plot import Plot
+from plugins import mask_from_string, source_from_string
 import dialogs
 import jobs
 from evalTab import EvalTab
