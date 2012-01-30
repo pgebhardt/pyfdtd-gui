@@ -1,4 +1,4 @@
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from plot import *
 from numpy import *
 from scipy import *

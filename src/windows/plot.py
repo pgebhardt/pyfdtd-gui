@@ -9,7 +9,6 @@ from matplotlib.backends.backend_qt4agg \
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
-import matplotlib.pyplot as plt
 from PySide import QtCore, QtGui
 
 

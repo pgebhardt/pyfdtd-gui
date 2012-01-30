@@ -1,12 +1,21 @@
+"""Main execution file of PyFDTD-GUI."""
+
 import sys
-from PySide import QtCore, QtGui
+from PySide import QtGui
 import windows
-import dialogs
 
-# create application
-app = QtGui.QApplication(sys.argv)
 
-mainWindow = windows.MainWindow()
-mainWindow.show()
+def main():
+    # create application
+    app = QtGui.QApplication(sys.argv)
 
-sys.exit(app.exec_())
+    # create mainWindow
+    mainWindow = windows.MainWindow()
+    mainWindow.show()
+
+    # run main loop
+    sys.exit(app.exec_())
+
+# call main function
+if __name__ == '__main__':
+    main()
