@@ -173,6 +173,11 @@ class MainWindow(QtGui.QMainWindow):
         self.job.save(fname)
 
     def run_simulation(self):
+        # clear field
+        self.simulation.field = pyfdtd.field(self.simulation.field.xSize,
+                self.simulation.field.ySize, self.simulation.field.deltaX,
+                self.simulation.field.deltaY)
+
         # progress function
         self.simulationHistory = []
         duration = 5.0e-9
