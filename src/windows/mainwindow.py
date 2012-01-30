@@ -7,6 +7,7 @@ from plot import *
 import dialogs
 import jobs
 from evalwindow import *
+from editTab import EditTab
 
 
 # Main window for pyfdtd-gui application
@@ -35,61 +36,13 @@ class MainWindow(QtGui.QMainWindow):
         for action in self.actions:
             fileMenu.addAction(action)
 
-        # create Container
-        self.container = QtGui.QWidget(self)
-        self.setCentralWidget(self.container)
+        # init tab view
+        tabView = QtGui.QTabWidget()
+        self.setCentralWidget(tabView)
 
-        # create Plot
-        self.plot = Plot(self.simulation)
-
-        # create button
-        startSimButton = QtGui.QPushButton('start simulation')
-        startSimButton.resize(startSimButton.sizeHint())
-        startSimButton.clicked.connect(self.run_simulation)
-
-        # create treeview
-        treeGrid = QtGui.QGridLayout()
-        treeLabel = QtGui.QLabel('Layer:')
-
-        # new Layer Button
-        def new_layer_clicked():
-            self.newLayerDialog = dialogs.NewLayer(mainWindow=self)
-            self.newLayerDialog.okButton.clicked.connect(self.new_layer)
-            self.newLayerDialog.show()
-
-        newLayerButton = QtGui.QPushButton('New Layer')
-        newLayerButton.clicked.connect(new_layer_clicked)
-
-        self.treeWidget = QtGui.QTreeWidget()
-        self.treeWidget.setHeaderLabels(['Name', 'Mask', 'Function'])
-        self.treeWidget.setColumnCount(3)
-        treeLabel.setBuddy(self.treeWidget)
-
-        # init tree
-        self.init_tree()
-
-        treeGrid.addWidget(treeLabel, 0, 0)
-        treeGrid.addWidget(self.treeWidget, 1, 0)
-
-        # layout
-        grid = QtGui.QGridLayout()
-        grid.addWidget(self.plot, 0, 0)
-        grid.addWidget(startSimButton, 1, 0)
-        grid.addWidget(newLayerButton, 1, 1)
-        grid.addLayout(treeGrid, 0, 1)
-        self.container.setLayout(grid)
-
-    def init_tree(self):
-        # clear tree
-        self.treeWidget.clear()
-
-        # init tree
-        self.layerItems = []
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Electric']))
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Magnetic']))
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Source']))
-        self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Listener']))
-        self.treeWidget.addTopLevelItems(self.layerItems)
+        # create edit tab
+        editTab = EditTab(self.simulation)
+        tabView.addTab(editTab, 'Edit')
 
     def create_actions(self):
         # create action list
