@@ -1,5 +1,7 @@
 from PySide import QtGui
-from dialogs import NewLayer
+from pyfdtd import material, masks, listener, source
+from plugins import *
+import dialogs
 from plot import Plot
 import numpy
 
@@ -75,9 +77,6 @@ class EditTab(QtGui.QWidget):
                     self.mainwindow.simulation.field.oddFieldX['field'].shape)]
         self.plot.update()
 
-        # init tree
-        self.init_tree()
-
     def new_layer(self):
         # close dialog
         self.newLayerDialog.close()
@@ -128,11 +127,14 @@ class EditTab(QtGui.QWidget):
                 QtGui.QTreeWidgetItem(self.layerItems[3],
                         [name, 'x={}, y={}'.format(x, y)])
                 self.mainwindow.job.listener.append((name, x, y))
+                print type_
 
         except SyntaxError:
             return
+
         except NameError:
             return
+
         except ValueError:
             return
 

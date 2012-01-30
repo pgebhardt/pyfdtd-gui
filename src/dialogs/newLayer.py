@@ -2,7 +2,7 @@ from PySide import QtGui, QtCore
 
 
 class NewLayer(QtGui.QWidget):
-    def __init__(self, mainWindow=None):
+    def __init__(self, mainwindow=None):
         # call base class constructor
         super(NewLayer, self).__init__()
 
@@ -10,7 +10,7 @@ class NewLayer(QtGui.QWidget):
         self.init_gui()
 
         # save parameter
-        self.mainWindow = mainWindow
+        self.mainwindow = mainwindow
 
     def init_gui(self):
         # set window title

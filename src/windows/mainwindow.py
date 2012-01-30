@@ -1,13 +1,13 @@
 from PySide import QtCore, QtGui
 import matplotlib.colors as colors
 import pickle
-from pyfdtd import *
-from plugins import *
-from plot import *
+import pyfdtd
+from plot import Plot
 import dialogs
 import jobs
-from evalwindow import *
+from evalTab import EvalTab
 from editTab import EditTab
+from playTab import PlayTab
 
 
 # Main window for pyfdtd-gui application
@@ -17,7 +17,7 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
 
         # init simulation
-        self.simulation = solver(field(0.4, 0.4, 0.001))
+        self.simulation = pyfdtd.solver(pyfdtd.field(0.4, 0.4, 0.001))
         self.job = jobs.Job()
 
         # initialize gui elements
@@ -43,6 +43,14 @@ class MainWindow(QtGui.QMainWindow):
         # create edit tab
         self.editTab = EditTab(self)
         tabView.addTab(self.editTab, 'Edit')
+
+        # create play tab
+        self.playTab = PlayTab(self)
+        tabView.addTab(self.playTab, 'Play')
+
+        # create edit tab
+        self.evalTab = EvalTab(self)
+        tabView.addTab(self.evalTab, 'Evaluate')
 
     def create_actions(self):
         # create action list
@@ -76,7 +84,7 @@ class MainWindow(QtGui.QMainWindow):
             self.newSimDialog.close()
 
             # update simulation
-            self.simulation = solver(field(
+            self.simulation = pyfdtd.solver(pyfdtd.field(
                 float(self.newSimDialog.xSizeEdit.text()),
                 float(self.newSimDialog.ySizeEdit.text()),
                 float(self.newSimDialog.deltaYEdit.text()),
@@ -90,6 +98,7 @@ class MainWindow(QtGui.QMainWindow):
                     self.simulation.field.deltaY)
 
             # update edit tab
+            self.editTab.init_tree()
             self.editTab.update()
 
         # create dialog
@@ -121,16 +130,19 @@ class MainWindow(QtGui.QMainWindow):
         deltaX, deltaY = self.job.config['delta']
         self.simulation = solver(field(xSize, ySize, deltaX, deltaY))
 
+        # clear editTab tree
+        self.editTab.init_tree()
+
         # update materials
         for name, mask, er, sigma in self.job.material['electric']:
             self.simulation.material['electric'][mask_from_string(mask)] = \
-                material.epsilon(er=er, sigma=sigma)
+                pyfdtd.material.epsilon(er=er, sigma=sigma)
             QtGui.QTreeWidgetItem(self.editTab.layerItems[0],
                     [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
 
         for name, mask, mur, sigma in self.job.material['magnetic']:
             self.simulation.material['magnetic'][mask_from_string(mask)] = \
-                material.mu(mur=mur, sigma=sigma)
+                pyfdtd.material.mu(mur=mur, sigma=sigma)
             QtGui.QTreeWidgetItem(self.editTab.layerItems[1],
                     [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
 
@@ -143,7 +155,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # update listener
         for name, x, y in self.job.listener:
-            self.simulation.listener.append(listener(x, y))
+            self.simulation.listener.append(pyfdtd.listener(x, y))
             QtGui.QTreeWidgetItem(self.editTab.layerItems[3],
                     [name, 'x={}, y={}'.format(x, y)])
 
