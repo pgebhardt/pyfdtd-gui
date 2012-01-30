@@ -39,13 +39,6 @@ class Plot(QtGui.QWidget):
 
         # save simulation
         self.simulation = simulation
-        self.step = 0
-        self.simulationHistory = [
-                numpy.zeros(self.simulation.field.oddFieldX['field'].shape)
-                ]
-
-        # create timer
-        self.init_timer()
 
         # create canvas
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
@@ -104,30 +97,14 @@ class Plot(QtGui.QWidget):
         # plot
         self.plot()
 
-    def plot(self):
+    def plot(self, field=None):
         # plot
-        self.im.set_array(self.masks + self.sources +
-                self.listener + self.simulationHistory[self.step])
+        if field == None:
+            self.im.set_array(self.masks + self.sources + \
+                self.listener)
+        else:
+            self.im.set_array(self.masks + self. sources + \
+                self.listener + field)
 
         # update canvas
         self.canvas.draw()
-
-    def init_timer(self):
-        # timer function
-        def timeout():
-            # increment step
-            self.step += 1
-            if self.step >= len(self.simulationHistory):
-                self.step = 0
-
-        # create timer
-        self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.plot)
-        self.timer.timeout.connect(timeout)
-
-    def show_simulation(self, simulationHistory):
-        # save history
-        self.simulationHistory = simulationHistory
-
-        # start timer
-        self.timer.start(50)

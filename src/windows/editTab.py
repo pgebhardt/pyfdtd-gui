@@ -73,8 +73,6 @@ class EditTab(QtGui.QWidget):
     def update(self):
         # update plot
         self.plot.simulation = self.mainwindow.simulation
-        self.plot.simulationHistory = [numpy.zeros(
-                    self.mainwindow.simulation.field.oddFieldX['field'].shape)]
         self.plot.update()
 
     def new_layer(self):
@@ -140,3 +138,4 @@ class EditTab(QtGui.QWidget):
 
         # update plot
         self.plot.update()
+        self.mainwindow.playTab.update()

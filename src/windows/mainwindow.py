@@ -1,7 +1,7 @@
 from PySide import QtCore, QtGui
-import matplotlib.colors as colors
 import pickle
 import pyfdtd
+from plugins import *
 from plot import Plot
 import dialogs
 import jobs
@@ -100,6 +100,7 @@ class MainWindow(QtGui.QMainWindow):
             # update edit tab
             self.editTab.init_tree()
             self.editTab.update()
+            self.playTab.update()
 
         # create dialog
         self.newSimDialog = dialogs.NewSimulation()
@@ -128,7 +129,8 @@ class MainWindow(QtGui.QMainWindow):
         # create new simulation
         xSize, ySize = self.job.config['size']
         deltaX, deltaY = self.job.config['delta']
-        self.simulation = solver(field(xSize, ySize, deltaX, deltaY))
+        self.simulation = pyfdtd.solver(pyfdtd.field(
+            xSize, ySize, deltaX, deltaY))
 
         # clear editTab tree
         self.editTab.init_tree()
@@ -161,6 +163,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # update edit tab
         self.editTab.update()
+        self.playTab.update()
 
     def save_simulation(self):
         # open dialog
@@ -190,11 +193,8 @@ class MainWindow(QtGui.QMainWindow):
         # finish function
         def finish():
             # start timer
-            self.plot.show_simulation(self.simulationHistory)
-
-            # open eval window
-            self.evalWindow = EvalWindow(self.simulation)
-            self.evalWindow.show()
+            self.playTab.simulationHistory = self.simulationHistory
+            self.playTab.playButton.setEnabled(True)
 
         # run simulation
         self.simulation.solve(duration,
