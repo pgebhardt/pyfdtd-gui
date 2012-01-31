@@ -43,11 +43,11 @@ class EditTab(QtGui.QWidget):
             type_ = self.newLayerDialog.typeComboBox.currentText()
             mask = self.newLayerDialog.maskEdit.text()
             function = self.newLayerDialog.functionEdit.text()
-            er = self.newLayerDialog.rEdit.text()
-            mur = self.newLayerDialog.rEdit.text()
-            sigma = self.newLayerDialog.sigmaEdit.text()
-            x = self.newLayerDialog.xEdit.text()
-            y = self.newLayerDialog.yEdit.text()
+            er = float(self.newLayerDialog.rEdit.text())
+            mur = float(self.newLayerDialog.rEdit.text())
+            sigma = float(self.newLayerDialog.sigmaEdit.text())
+            x = float(self.newLayerDialog.xEdit.text())
+            y = float(self.newLayerDialog.yEdit.text())
 
             # create new Layer
             self.new_layer(name, type_, mask, function=function, er=er,

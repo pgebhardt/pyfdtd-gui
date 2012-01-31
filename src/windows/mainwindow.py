@@ -98,10 +98,12 @@ class MainWindow(QtGui.QMainWindow):
 
             # update job
             self.job = jobs.Job()
-            self.job.config['size'] = (self.simulation.field.xSize,
-                    self.simulation.field.ySize)
-            self.job.config['delta'] = (self.simulation.field.deltaX,
-                    self.simulation.field.deltaY)
+            self.job.config['size'] = (
+                    float(self.newSimDialog.xSizeEdit.text()),
+                    float(self.newSimDialog.ySizeEdit.text()))
+            self.job.config['delta'] = (
+                    float(self.newSimDialog.deltaXEdit.text()),
+                    float(self.newSimDialog.deltaYEdit.text()))
 
             # update edit tab
             self.editTab.update_job()

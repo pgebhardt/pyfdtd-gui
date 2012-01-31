@@ -36,11 +36,11 @@ class NewLayer(QtGui.QWidget):
                                     'Source', 'Listener'])
         self.typeComboBox.currentIndexChanged.connect(self.update_gui)
         self.maskEdit = QtGui.QLineEdit()
-        self.rEdit = QtGui.QLineEdit()
-        self.sigmaEdit = QtGui.QLineEdit()
+        self.rEdit = QtGui.QLineEdit('1.0')
+        self.sigmaEdit = QtGui.QLineEdit('0.0')
         self.functionEdit = QtGui.QLineEdit()
-        self.xEdit = QtGui.QLineEdit()
-        self.yEdit = QtGui.QLineEdit()
+        self.xEdit = QtGui.QLineEdit('0.0')
+        self.yEdit = QtGui.QLineEdit('0.0')
 
         # create labels
         nameLabel = QtGui.QLabel('Name:')
