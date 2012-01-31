@@ -180,11 +180,11 @@ class MainWindow(QtGui.QMainWindow):
     def run_simulation(self):
         # progress function
         self.simulationHistory = []
-        duration = 5.0e-9
 
         def progress(t, deltaT, field):
             xShape, yShape = field.oddFieldX['flux'].shape
-            interval = xShape * yShape * duration / (256e6 / 4.0)
+            interval = xShape * yShape * self.job.config['duration'] / \
+                    (256e6 / 4.0)
 
             # save history
             if t / deltaT % (interval / deltaT) < 1.0:
@@ -193,7 +193,7 @@ class MainWindow(QtGui.QMainWindow):
 
             # print progess
             if t / deltaT % 100 < 1.0:
-                print '{}'.format(t * 100.0 / duration)
+                print '{}'.format(t * 100.0 / self.job.config['duration'])
 
         # finish function
         def finish():
@@ -201,12 +201,12 @@ class MainWindow(QtGui.QMainWindow):
             self.playTab.simulationHistory = self.simulationHistory
             self.playTab.playButton.setEnabled(True)
 
-            # clear simulation
-            self.editTab.update_job()
-
         # deactivate play button
         self.playTab.playButton.setDisabled(True)
 
+        # clear simulation
+        self.editTab.update_job()
+
         # run simulation
-        self.simulation.solve(duration,
+        self.simulation.solve(self.job.config['duration'],
                 progressfunction=progress, finishfunction=finish)

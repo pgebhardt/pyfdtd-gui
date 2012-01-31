@@ -1,14 +1,17 @@
 (dp0
-S'delta'
+S'duration'
 p1
-(F0.001
-F0.001
-tp2
+F5e-09
 sS'size'
-p3
+p2
 (F0.2
 F0.4
-tp4
+tp3
+sS'delta'
+p4
+(F0.001
+F0.001
+tp5
 s.(lp0
 (VEmpfänger 1
 p1
