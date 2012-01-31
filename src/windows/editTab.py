@@ -1,5 +1,5 @@
 from PySide import QtGui
-from pyfdtd import material, listener
+import pyfdtd
 from plugins import mask_from_string, source_from_string
 import dialogs
 from plot import Plot
@@ -28,12 +28,51 @@ class EditTab(QtGui.QWidget):
         startSimButton = QtGui.QPushButton('Start Simulation')
         startSimButton.clicked.connect(self.mainwindow.run_simulation)
 
-        # new layer button
+        # button functions
         def new_layer_clicked():
             self.newLayerDialog = dialogs.NewLayer(mainwindow=self.mainwindow)
-            self.newLayerDialog.okButton.clicked.connect(self.new_layer)
+            self.newLayerDialog.okButton.clicked.connect(new_layer_create)
             self.newLayerDialog.show()
 
+        def new_layer_create():
+            # cloase dialof
+            self.newLayerDialog.close()
+
+            # get attributes
+            name = self.newLayerDialog.nameEdit.text()
+            type_ = self.newLayerDialog.typeComboBox.currentText()
+            mask = self.newLayerDialog.maskEdit.text()
+            function = self.newLayerDialog.functionEdit.text()
+            er = self.newLayerDialog.rEdit.text()
+            mur = self.newLayerDialog.rEdit.text()
+            sigma = self.newLayerDialog.sigmaEdit.text()
+            x = self.newLayerDialog.xEdit.text()
+            y = self.newLayerDialog.yEdit.text()
+
+            # create new Layer
+            self.new_layer(name, type_, mask, function=function, er=er,
+                    mur=mur, sigma=sigma, x=x, y=y)
+
+            # add to job
+            if type_ == 'Electric':
+                self.mainwindow.job.material['electric'].append(
+                        [name, mask, er, mur])
+
+            elif type_ == 'Magnetic':
+                self.mainwindow.job.material['magnetic'].append(
+                        [name, mask, mur, sigma])
+
+            elif type_ == 'Source':
+                self.mainwindow.job.source.append([name, mask, function])
+
+            elif type_ == 'Listener':
+                self.mainwindow.job.listener.append([name, x, y])
+
+            # update plot
+            self.plot.update()
+            self.mainwindow.playTab.update()
+
+        # create new layer button
         newLayerButton = QtGui.QPushButton('New Layer')
         newLayerButton.clicked.connect(new_layer_clicked)
 
@@ -69,62 +108,71 @@ class EditTab(QtGui.QWidget):
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Listener']))
         self.treeWidget.addTopLevelItems(self.layerItems)
 
-    def update(self):
+    def update_job(self):
+        # clear editTab tree
+        self.init_tree()
+
+        # create new simulation
+        xSize, ySize = self.mainwindow.job.config['size']
+        deltaX, deltaY = self.mainwindow.job.config['delta']
+        self.mainwindow.simulation = pyfdtd.solver(
+                pyfdtd.field(xSize, ySize, deltaX, deltaY))
+
+        # update materials
+        for name, mask, er, sigma in self.mainwindow.job.material['electric']:
+            self.new_layer(name, 'Electric', mask, er=er, sigma=sigma)
+
+        for name, mask, mur, sigma in self.mainwindow.job.material['magnetic']:
+            self.new_layer(name, 'Magnetic', mask, mur=mur, sigma=sigma)
+
+        # update sources
+        for name, mask, function in self.mainwindow.job.source:
+            self.new_layer(name, 'Source', mask, function=function)
+
+        # update listener
+        for name, x, y in self.mainwindow.job.listener:
+            self.new_layer(name, 'Listener', x=x, y=y)
+
+        # update plot
+        self.plot.update()
+        self.mainwindow.playTab.update()
+
+    def update_plot(self):
         # update plot
         self.plot.simulation = self.mainwindow.simulation
         self.plot.update()
 
-    def new_layer(self):
-        # close dialog
-        self.newLayerDialog.close()
-
-        # get attributes
-        name = self.newLayerDialog.nameEdit.text()
-        type_ = self.newLayerDialog.typeComboBox.currentText()
-        mask = self.newLayerDialog.maskEdit.text()
-        function = self.newLayerDialog.functionEdit.text()
-
+    def new_layer(self, name, type_, mask=None, function=None, er=1.0, mur=1.0,
+            sigma=0.0, x=0.0, y=0.0):
         # create layer
         try:
             if type_ == 'Electric':
-                er, sigma = (float(self.newLayerDialog.rEdit.text()),
-                        float(self.newLayerDialog.sigmaEdit.text()))
                 self.mainwindow.simulation.material['electric'][
                         mask_from_string(mask)] = \
-                                material.epsilon(er=er, sigma=sigma)
+                                pyfdtd.material.epsilon(er=er, sigma=sigma)
                 QtGui.QTreeWidgetItem(self.layerItems[0],
                         [name, mask,
                             'epsilon(er={}, sigma={})'.format(er, sigma)])
-                self.mainwindow.job.material['electric'].append(
-                        (name, mask, er, sigma))
 
             elif type_ == 'Magnetic':
-                mur, sigma = (float(self.newLayerDialog.rEdit.text()),
-                        float(self.newLayerDialog.sigmaEdit.text()))
                 self.mainwindow.simulation.material['electric'][
                         mask_from_string(mask)] = \
-                                material.mu(mur=mur, sigma=sigma)
+                               pyfdtd.material.mu(mur=mur, sigma=sigma)
                 QtGui.QTreeWidgetItem(self.layerItems[1],
                         [name, mask,
                             'mu(mur={}, sigma={})'.format(mur, sigma)])
-                self.mainwindow.job.material['magnetic'].append(
-                        (name, mask, mur, sigma))
 
             elif type_ == 'Source':
                 self.mainwindow.simulation.source[
                         mask_from_string(mask)] = source_from_string(function)
                 QtGui.QTreeWidgetItem(self.layerItems[2],
                         [name, mask, function])
-                self.mainwindow.job.source.append((name, mask, function))
 
             elif type_ == 'Listener':
-                x, y = (float(self.newLayerDialog.xEdit.text()),
-                        float(self.newLayerDialog.yEdit.text()))
-                self.mainwindow.simulation.listener.append(listener(x, y))
+                self.mainwindow.simulation.listener.append(
+                        pyfdtd.listener(x, y))
                 QtGui.QTreeWidgetItem(self.layerItems[3],
                         [name, 'x={}, y={}'.format(x, y)])
-                self.mainwindow.job.listener.append((name, x, y))
-                print type_
 
         except SyntaxError:
             return
@@ -134,7 +182,3 @@ class EditTab(QtGui.QWidget):
 
         except ValueError:
             return
-
-        # update plot
-        self.plot.update()
-        self.mainwindow.playTab.update()

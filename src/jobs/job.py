@@ -1,11 +1,11 @@
-from pyfdtd import *
 import pickle
 
 
 class Job:
     def __init__(self):
         # create standart values
-        self.config = {'size': (0.4, 0.4), 'delta': (0.001, 0.001)}
+        self.config = {'size': (0.4, 0.4), 'delta': (0.001, 0.001), 'duration':
+                5e-9}
         self.listener = []
         self.source = []
         self.material = {'electric': [], 'magnetic': []}

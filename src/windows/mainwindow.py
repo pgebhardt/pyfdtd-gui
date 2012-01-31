@@ -1,6 +1,5 @@
 from PySide import QtGui
 import pyfdtd
-from plugins import mask_from_string, source_from_string
 import dialogs
 import jobs
 from evalTab import EvalTab
@@ -29,10 +28,14 @@ class MainWindow(QtGui.QMainWindow):
 
         # create menu bar
         fileMenu = self.menuBar().addMenu('&File')
+        scriptMenu = self.menuBar().addMenu('&Script')
 
         # add actions
-        for action in self.actions:
+        for action in self.fileActions:
             fileMenu.addAction(action)
+
+        for action in self.scriptActions:
+            scriptMenu.addAction(action)
 
         # init tab view
         tabView = QtGui.QTabWidget()
@@ -52,23 +55,35 @@ class MainWindow(QtGui.QMainWindow):
 
     def create_actions(self):
         # create action list
-        self.actions = []
+        self.fileActions = []
+        self.scriptActions = []
 
         # new simulation action
-        self.actions.append(QtGui.QAction('&New', self, shortcut='Ctrl+N',
+        self.fileActions.append(QtGui.QAction('&New', self, shortcut='Ctrl+N',
             statusTip='New simulation', triggered=self.new_simulation))
 
         # open simulation action
-        self.actions.append(QtGui.QAction('&Open', self, shortcut='Ctrl+O',
-                statusTip='Open simulation', triggered=self.open_simulation))
+        self.fileActions.append(QtGui.QAction('&Open', self,
+            shortcut='Ctrl+O', statusTip='Open simulation',
+            triggered=self.open_simulation))
 
         # save simulation action
-        self.actions.append(QtGui.QAction('&Save', self, shortcut='Ctrl+S',
+        self.fileActions.append(QtGui.QAction('&Save', self, shortcut='Ctrl+S',
                 statusTip='Save simulation', triggered=self.save_simulation))
 
         # exit action
-        self.actions.append(QtGui.QAction('&Exit', self, shortcut='Ctrl+Q',
+        self.fileActions.append(QtGui.QAction('&Exit', self, shortcut='Ctrl+Q',
             statusTip='Exit application', triggered=self.close))
+
+        # open script actions
+        self.scriptActions.append(QtGui.QAction('Open Script', self,
+            shortcut='Ctrl+C+O', statusTip='Open evaluation script',
+            triggered=self.open_script))
+
+        # open script actions
+        self.scriptActions.append(QtGui.QAction('Save Script', self,
+            shortcut='Ctrl+C+S', statusTip='Save evaluation script',
+            triggered=self.save_script))
 
     def closeEvent(self, event):
         # close eval window
@@ -81,13 +96,6 @@ class MainWindow(QtGui.QMainWindow):
             # close dialog
             self.newSimDialog.close()
 
-            # update simulation
-            self.simulation = pyfdtd.solver(pyfdtd.field(
-                float(self.newSimDialog.xSizeEdit.text()),
-                float(self.newSimDialog.ySizeEdit.text()),
-                float(self.newSimDialog.deltaYEdit.text()),
-                float(self.newSimDialog.deltaYEdit.text())))
-
             # update job
             self.job = jobs.Job()
             self.job.config['size'] = (self.simulation.field.xSize,
@@ -96,8 +104,8 @@ class MainWindow(QtGui.QMainWindow):
                     self.simulation.field.deltaY)
 
             # update edit tab
-            self.editTab.init_tree()
-            self.editTab.update()
+            self.editTab.update_job()
+            self.editTab.update_plot()
             self.playTab.update()
 
         # create dialog
@@ -117,14 +125,13 @@ class MainWindow(QtGui.QMainWindow):
         # show dialog
         self.newSimDialog.show()
 
-    def open_simulation(self, fromFile=True):
-        if fromFile:
-            # open dialog
-            fname, _ = QtGui.QFileDialog.getOpenFileName(
-                    self, 'Open simulation')
+    def open_simulation(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getOpenFileName(
+                self, 'Open simulation')
 
-            # load job
-            self.job.load(fname)
+        # load job
+        self.job.load(fname)
 
         # create new simulation
         xSize, ySize = self.job.config['size']
@@ -132,37 +139,9 @@ class MainWindow(QtGui.QMainWindow):
         self.simulation = pyfdtd.solver(pyfdtd.field(
             xSize, ySize, deltaX, deltaY))
 
-        # clear editTab tree
-        self.editTab.init_tree()
-
-        # update materials
-        for name, mask, er, sigma in self.job.material['electric']:
-            self.simulation.material['electric'][mask_from_string(mask)] = \
-                pyfdtd.material.epsilon(er=er, sigma=sigma)
-            QtGui.QTreeWidgetItem(self.editTab.layerItems[0],
-                    [name, mask, 'epsilon(er={}, sigma={})'.format(er, sigma)])
-
-        for name, mask, mur, sigma in self.job.material['magnetic']:
-            self.simulation.material['magnetic'][mask_from_string(mask)] = \
-                pyfdtd.material.mu(mur=mur, sigma=sigma)
-            QtGui.QTreeWidgetItem(self.editTab.layerItems[1],
-                    [name, mask, 'mu(mur={}, sigma={})'.format(mur, sigma)])
-
-        # update sources
-        for name, mask, function in self.job.source:
-            self.simulation.source[mask_from_string(mask)] = \
-                    source_from_string(function)
-            QtGui.QTreeWidgetItem(self.editTab.layerItems[2],
-                    [name, mask, function])
-
-        # update listener
-        for name, x, y in self.job.listener:
-            self.simulation.listener.append(pyfdtd.listener(x, y))
-            QtGui.QTreeWidgetItem(self.editTab.layerItems[3],
-                    [name, 'x={}, y={}'.format(x, y)])
-
         # update edit tab
-        self.editTab.update()
+        self.editTab.update_job()
+        self.editTab.update_plot()
         self.playTab.update()
 
     def save_simulation(self):
@@ -172,12 +151,33 @@ class MainWindow(QtGui.QMainWindow):
         # save job
         self.job.save(fname)
 
-    def run_simulation(self):
-        # clear field
-        self.simulation.field = pyfdtd.field(self.simulation.field.xSize,
-                self.simulation.field.ySize, self.simulation.field.deltaX,
-                self.simulation.field.deltaY)
+    def open_script(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open Script')
 
+        # open file
+        f = open(fname, 'r')
+
+        # set text
+        self.evalTab.inputEdit.setText(f.read())
+
+        # close file
+        f.close()
+
+    def save_script(self):
+        # open dialog
+        fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save Script')
+
+        # open fileMenu
+        f = open(fname, 'w')
+
+        # save text
+        f.write(self.evalTab.inputEdit.toPlainText())
+
+        # close file
+        f.close()
+
+    def run_simulation(self):
         # progress function
         self.simulationHistory = []
         duration = 5.0e-9
@@ -200,6 +200,12 @@ class MainWindow(QtGui.QMainWindow):
             # start timer
             self.playTab.simulationHistory = self.simulationHistory
             self.playTab.playButton.setEnabled(True)
+
+            # clear simulation
+            self.editTab.update_job()
+
+        # deactivate play button
+        self.playTab.playButton.setDisabled(True)
 
         # run simulation
         self.simulation.solve(duration,
