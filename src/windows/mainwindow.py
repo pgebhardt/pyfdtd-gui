@@ -140,52 +140,56 @@ class MainWindow(QtGui.QMainWindow):
         fname, _ = QtGui.QFileDialog.getOpenFileName(
                 self, 'Open simulation')
 
-        # load job
-        self.job.load(fname)
+        if fname != '':
+            # load job
+            self.job.load(fname)
 
-        # create new simulation
-        xSize, ySize = self.job.config['size']
-        deltaX, deltaY = self.job.config['delta']
-        self.simulation = pyfdtd.solver(pyfdtd.field(
-            xSize, ySize, deltaX, deltaY))
+            # create new simulation
+            xSize, ySize = self.job.config['size']
+            deltaX, deltaY = self.job.config['delta']
+            self.simulation = pyfdtd.solver(pyfdtd.field(
+                xSize, ySize, deltaX, deltaY))
 
-        # update edit tab
-        self.editTab.update_job()
-        self.editTab.update_plot()
-        self.playTab.update()
+            # update edit tab
+            self.editTab.update_job()
+            self.editTab.update_plot()
+            self.playTab.update()
 
     def save_simulation(self):
         # open dialog
         fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save simulation')
 
-        # save job
-        self.job.save(fname)
+        if fname != '':
+            # save job
+            self.job.save(fname)
 
     def open_script(self):
         # open dialog
         fname, _ = QtGui.QFileDialog.getOpenFileName(self, 'Open Script')
 
-        # open file
-        f = open(fname, 'r')
+        if fname != '':
+            # open file
+            f = open(fname, 'r')
 
-        # set text
-        self.evalTab.inputEdit.setText(f.read())
+            # set text
+            self.evalTab.inputEdit.setText(f.read())
 
-        # close file
-        f.close()
+            # close file
+            f.close()
 
     def save_script(self):
         # open dialog
         fname, _ = QtGui.QFileDialog.getSaveFileName(self, 'Save Script')
 
-        # open fileMenu
-        f = open(fname, 'w')
+        if fname != '':
+            # open fileMenu
+            f = open(fname, 'w')
 
-        # save text
-        f.write(self.evalTab.inputEdit.toPlainText())
+            # save text
+            f.write(self.evalTab.inputEdit.toPlainText())
 
-        # close file
-        f.close()
+            # close file
+            f.close()
 
     def run_simulation(self):
         # callback functions
