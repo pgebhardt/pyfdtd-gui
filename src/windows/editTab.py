@@ -56,7 +56,7 @@ class EditTab(QtGui.QWidget):
             # add to job
             if type_ == 'Electric':
                 self.mainwindow.job.material['electric'].append(
-                        [name, mask, er, mur])
+                        [name, mask, er, sigma])
 
             elif type_ == 'Magnetic':
                 self.mainwindow.job.material['magnetic'].append(
