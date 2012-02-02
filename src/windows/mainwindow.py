@@ -1,10 +1,12 @@
 from PySide import QtGui
+from PySide import QtCore
 import pyfdtd
 import dialogs
 import jobs
 from evalTab import EvalTab
 from editTab import EditTab
 from playTab import PlayTab
+import simulation
 
 
 # Main window for pyfdtd-gui application
@@ -52,6 +54,12 @@ class MainWindow(QtGui.QMainWindow):
         # create edit tab
         self.evalTab = EvalTab(self)
         tabView.addTab(self.evalTab, 'Evaluate')
+
+        # create status bar
+        statusBar = self.statusBar()
+        self.progressBar = QtGui.QProgressBar()
+        self.progressBar.setRange(0.0, 100.0)
+        statusBar.addPermanentWidget(self.progressBar, 1)
 
     def create_actions(self):
         # create action list
@@ -180,35 +188,22 @@ class MainWindow(QtGui.QMainWindow):
         f.close()
 
     def run_simulation(self):
-        # progress function
-        self.simulationHistory = []
+        # callback functions
+        def timer():
+            self.progressBar.setValue(self.simulationThread.progress)
 
-        def progress(t, deltaT, field):
-            xShape, yShape = field.oddFieldX['flux'].shape
-            interval = xShape * yShape * self.job.config['duration'] / \
-                    (256e6 / 4.0)
+        def finished():
+            self.updateTimer.stop()
+            self.progressBar.setValue(100.0)
 
-            # save history
-            if t / deltaT % (interval / deltaT) < 1.0:
-                self.simulationHistory.append(field.oddFieldX['field']
-                        + field.oddFieldY['field'])
+        # create simulation thread
+        self.simulationThread = simulation.SimulationThread(self)
 
-            # print progess
-            if t / deltaT % 100 < 1.0:
-                print '{}'.format(t * 100.0 / self.job.config['duration'])
+        # create timer
+        self.updateTimer = QtCore.QTimer(self)
+        self.updateTimer.timeout.connect(timer)
+        self.simulationThread.finished.connect(finished)
 
-        # finish function
-        def finish():
-            # start timer
-            self.playTab.simulationHistory = self.simulationHistory
-            self.playTab.playButton.setEnabled(True)
-
-        # deactivate play button
-        self.playTab.playButton.setDisabled(True)
-
-        # clear simulation
-        self.editTab.update_job()
-
-        # run simulation
-        self.simulation.solve(self.job.config['duration'],
-                progressfunction=progress, finishfunction=finish)
+        # run simulation thread
+        self.updateTimer.start(100)
+        self.simulationThread.start()

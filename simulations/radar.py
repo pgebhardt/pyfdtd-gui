@@ -9,5 +9,5 @@ plot.hold(True)
 
 # plot signals
 for signal in signals:
-    plot.plot(signal[750:1100])
+    plot.plot(signal)
 
