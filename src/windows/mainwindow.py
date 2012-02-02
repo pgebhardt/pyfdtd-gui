@@ -26,7 +26,7 @@ class MainWindow(QtGui.QMainWindow):
     def init_gui(self):
         # set window title
         self.setWindowTitle('Pyfdtd GUI')
-        self.resize(1000, 600)
+        self.resize(1200, 800)
 
         # create menu bar
         fileMenu = self.menuBar().addMenu('&File')

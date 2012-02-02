@@ -1,3 +1,9 @@
+import os
+os.environ['QT_API'] = 'pyside'
+
+from matplotlib.backends.backend_qt4agg \
+        import NavigationToolbar2QTAgg as NavigationToolbar
+
 from PySide import QtGui
 from plot import matplotlibCanvas
 from numpy import *
@@ -21,6 +27,9 @@ class EvalTab(QtGui.QWidget):
         # create plot
         self.plot = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Listener')
 
+        # create toolbar
+        self.toolbar = NavigationToolbar(self.plot, self)
+
         # create input
         self.inputEdit = QtGui.QTextEdit()
 
@@ -32,6 +41,7 @@ class EvalTab(QtGui.QWidget):
         root = QtGui.QGridLayout()
         root.addWidget(self.plot, 0, 0)
         root.addWidget(self.inputEdit, 0, 1)
+        root.addWidget(self.toolbar, 1, 0)
         root.addWidget(self.evalButton, 1, 1)
         self.setLayout(root)
 

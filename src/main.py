@@ -2,6 +2,9 @@
 
 import sys
 from PySide import QtGui
+import matplotlib
+matplotlib.use('Qt4Agg')
+
 import windows
 
 

@@ -2,10 +2,10 @@ import os
 os.environ['QT_API'] = 'pyside'
 
 import numpy
-import matplotlib
-matplotlib.use('Qt4Agg')
 from matplotlib.backends.backend_qt4agg \
         import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg \
+        import NavigationToolbar2QTAgg as NavigationToolbar
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
@@ -43,9 +43,13 @@ class Plot(QtGui.QWidget):
         # create canvas
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
 
+        # create toolbar
+        self.toolbar = NavigationToolbar(self.canvas, self)
+
         # create layout
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.canvas)
+        grid.addWidget(self.canvas, 0, 0)
+        grid.addWidget(self.toolbar, 1, 0)
         self.setLayout(grid)
 
         # plot once
