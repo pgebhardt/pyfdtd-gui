@@ -11,6 +11,11 @@ class SimulationThread(QtCore.QThread):
         self.progress = 0.0
 
     def run(self):
+        # init simulation
+        if hasattr(self, 'simulationHistory'):
+            # clear simulation
+            self.mainwindow.editTab.update_job()
+
         # progress function
         self.simulationHistory = []
 
@@ -36,9 +41,6 @@ class SimulationThread(QtCore.QThread):
 
         # deactivate play button
         self.mainwindow.playTab.playButton.setDisabled(True)
-
-        # clear simulation
-        self.mainwindow.editTab.update_job()
 
         # run simulation
         self.mainwindow.simulation.solve(

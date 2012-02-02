@@ -7,7 +7,10 @@ for l in listener:
 plot.grid(True)
 plot.hold(True)
 
+signals = map(hilbert, signals)
+signals = map(absolute, signals)
+
 # plot signals
 for signal in signals:
-    plot.plot(signal)
+    plot.plot(signal[1700:2200])
 

@@ -3,6 +3,7 @@ from plot import matplotlibCanvas
 from numpy import *
 from scipy import *
 from scipy.signal import *
+from scipy import constants
 
 
 class EvalTab(QtGui.QWidget):

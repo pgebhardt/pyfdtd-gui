@@ -54,10 +54,11 @@ class Plot(QtGui.QWidget):
     def update(self):
         # redraw im
         self.im = self.canvas.axes.imshow(
-                numpy.fabs(self.simulation.field.oddFieldX['field']),
+                numpy.fabs(numpy.transpose(
+                    self.simulation.field.oddFieldX['field'])),
                 norm=colors.Normalize(0.0, 10.0),
-                extent=[0.0, self.simulation.field.ySize,
-                    self.simulation.field.xSize, 0.0])
+                extent=[0.0, self.simulation.field.xSize,
+                    self.simulation.field.ySize, 0.0])
         self.canvas.axes.grid(True)
 
         # cummulate all layer masks
@@ -100,11 +101,11 @@ class Plot(QtGui.QWidget):
     def plot(self, field=None):
         # plot
         if field == None:
-            self.im.set_array(self.masks + self.sources + \
-                self.listener)
+            self.im.set_array(numpy.transpose(
+                self.masks + self.sources + self.listener))
         else:
-            self.im.set_array(self.masks + self. sources + \
-                self.listener + field)
+            self.im.set_array(numpy.transpose(
+                self.masks + self. sources + self.listener + field))
 
         # update canvas
         self.canvas.draw()
