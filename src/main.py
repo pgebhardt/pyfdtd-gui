@@ -1,20 +1,19 @@
 import sys
-from PySide.QtGui import *
-from PySide.QtCore import *
-from PySide.QtDeclarative import *
+from PySide import QtGui
+from PySide import QtDeclarative
 import windows
 
 # create qt application
-app = QApplication(sys.argv)
+app = QtGui.QApplication(sys.argv)
 
 # create view
-view = QDeclarativeView()
+view = QtDeclarative.QDeclarativeView()
 
 # create url to qml file
-url = QUrl('./windows/MainWindow.qml')
+url = QtDeclarative.QUrl('./windows/MainWindow.qml')
 
 # register plot
-qmlRegisterType(windows.Plot, 'MatplotLib', 1, 0, 'Plot')
+QtDeclarative.qmlRegisterType(windows.Plot, 'MatplotLib', 1, 0, 'Plot')
 # set qml file
 view.setSource(url)
 
