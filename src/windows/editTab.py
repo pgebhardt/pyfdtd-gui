@@ -22,7 +22,7 @@ class EditTab(QtGui.QWidget):
         self.setLayout(grid)
 
         # create plot
-        self.plot = Plot(self.mainwindow.simulation)
+        self.plot = Plot(self.mainwindow.job)
 
         # create buttons
         startSimButton = QtGui.QPushButton('Start Simulation')

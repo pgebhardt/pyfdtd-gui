@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
 from PySide import QtGui
+from plugins import BooleanParser
 
 
 class matplotlibCanvas(FigureCanvas):
@@ -33,12 +34,12 @@ class matplotlibCanvas(FigureCanvas):
 
 
 class Plot(QtGui.QWidget):
-    def __init__(self, simulation, parent=None):
+    def __init__(self, job, parent=None):
         # call base class constructor
         super(Plot, self).__init__()
 
         # save simulation
-        self.simulation = simulation
+        self.job = job
 
         # create canvas
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
@@ -57,43 +58,40 @@ class Plot(QtGui.QWidget):
 
     def update(self):
         # get parameter
-        sizeX, sizeY = self.simulation.field.size
+        sizeX, sizeY = self.job.config['size']
+        deltaX, deltaY = self.job.config['delta']
+
+        # create parser
+        parser = BooleanParser()
 
         # redraw im
         self.im = self.canvas.axes.imshow(
                 numpy.fabs(numpy.transpose(
-                    self.simulation.field.oddFieldX['field'])),
+                    numpy.zeros((sizeX / deltaX, sizeY / deltaY)))),
                 norm=colors.Normalize(0.0, 10.0),
                 extent=[0.0, sizeX, sizeY, 0.0])
         self.canvas.axes.grid(True)
 
         # cummulate all layer masks
-        self.masks = numpy.zeros(
-                self.simulation.field.oddFieldX['field'].shape)
-        self.sources = numpy.zeros(
-                self.simulation.field.oddFieldX['field'].shape)
-        self.listener = numpy.zeros(
-                self.simulation.field.oddFieldX['field'].shape)
+        self.masks = numpy.zeros((sizeX / deltaX, sizeY / deltaY))
+        self.sources = numpy.zeros(self.masks.shape)
+        self.listener = numpy.zeros(self.masks.shape)
 
         # get electric layer
-        layer = self.simulation.material['electric'].layer[2:]
-        for fX, fY, dX, dY, mask in layer:
-            self.masks += mask
+        for name, mask, er, sigma in self.job.material['electric']:
+            self.masks += numpy.where(parser.parser(mask), 1.0, 0.0)
 
         # get magnetic layer
-        layer = self.simulation.material['magnetic'].layer[2:]
-        for fX, fY, dX, dY, mask in layer:
-            self.masks += mask
+        for name, mask, mur, sigma in self.job.material['magnetic']:
+            self.masks += numpy.where(parser.parser(mask), 1.0, 0.0)
 
         # get sources
-        for fX, fY, dX, dY, mask in self.simulation.source.layer:
-            self.sources += mask
+        for name, mask, function in self.job.source:
+            self.sources += numpy.where(parser.parser(mask), 1.0, 0.0)
 
         # get listener
-        for listener in self.simulation.listener:
-            x, y = listener.pos
-            self.listener[x / self.simulation.field.deltaX,
-                    y / self.simulation.field.deltaY] = 5.0
+        for name, x, y in self.job.listener:
+            self.listener[x / deltaX, y / deltaY] = 5.0
 
         # norm masks
         if numpy.max(self.masks) != 0.0:
