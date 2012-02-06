@@ -7,9 +7,15 @@ class BooleanParser:
         pass
 
     def parse(self, expr, **kargs):
+        # not parsable callback
+        def callback_not_parasable(x, kargs):
+            print '\"{}\" not parsable'.format(x)
+
         # not callback
         def callback_not(x, kargs):
-            pass
+            # parse not
+            return self.unary_pareser(x, 'not', numpy.logical_not,
+                    callback_not_parasable, kargs)
 
         # and callback
         def callback_and(x, kargs):
@@ -91,6 +97,17 @@ class BooleanParser:
     def unary_pareser(self, x1, keyword, function, callback, kargs):
         print 'input: {}'.format(x1)
 
+        # check type of x1
+        if isinstance(x1, str):
+            expressions = x1.split(keyword)
+            print 'x1: {}'.format(expressions)
+
+            # check for length of expressions
+            if len(expressions) != 2:
+                raise ValueError('\"{}\" not parsable'.format(x1))
+
+            x1 = string.strip(expressions[1])
+
         # evaluate
         def evaluate(x):
             # check for list
@@ -119,6 +136,7 @@ class BooleanParser:
 
         # evaluate
         x1 = evaluate(x1)
+        print x1
         result = function(x1)
 
         # return
@@ -126,7 +144,7 @@ class BooleanParser:
         return result
 
 if __name__ == '__main__':
-    expr = 'X > 2 and X < 5 and Y > 1 and Y < 6'
+    expr = 'not X == 2'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 10.0, 1.0), numpy.arange(0.0, 10.0,
         1.0))
