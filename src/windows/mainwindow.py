@@ -203,7 +203,7 @@ class MainWindow(QtGui.QMainWindow):
             self.progressBar.setValue(100.0)
 
         # create parser
-        parser = plugins.BooleanParser()
+        parser = plugins.NumpyParser()
 
         # init simulation
         self.simulation = pyfdtd.solver(pyfdtd.field(
@@ -213,13 +213,13 @@ class MainWindow(QtGui.QMainWindow):
         x, y = self.simulation.material['electric'].meshgrid
 
         # create materials
-        for name, mask, er, sigma in self.job.material['electric']:
+        for name, mask, function in self.job.material['electric']:
             self.simulation.material['electric'][parser.parse(str(mask),
-                x=x, y=y)] = pyfdtd.material.epsilon(er, sigma)
+                x=x, y=y)] = plugins.source_from_string(function)
 
-        for name, mask, mur, sigma in self.job.material['magnetic']:
+        for name, mask, function in self.job.material['magnetic']:
             self.simulation.material['magnetic'][parser.parse(str(mask),
-                x=x, y=y)] = pyfdtd.material.mu(mur, sigma)
+                x=x, y=y)] = plugins.source_from_string(function)
 
         # create sources
         for name, mask, function in self.job.source:

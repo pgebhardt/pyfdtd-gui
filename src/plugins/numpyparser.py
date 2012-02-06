@@ -2,11 +2,15 @@ import numpy
 import string
 
 
-class BooleanParser:
+class NumpyParser:
     def __init__(self):
+        # ellipse function
+        def ellipse(x, y, rx, ry):
+            return x ** 2 / rx ** 2 + y ** 2 / ry ** 2 < 1.0
+
         # define globals
         self.globals_ = {'sin': numpy.sin, 'cos': numpy.cos, 'exp': numpy.exp,
-                'log': numpy.log, 'pi': numpy.pi}
+                'log': numpy.log, 'pi': numpy.pi, 'ellipse': ellipse}
 
     def parse(self, expr, **kargs):
         # not parsable callback
@@ -149,5 +153,5 @@ if __name__ == '__main__':
             numpy.arange(0.0, 1.0, 0.1))
 
     # create parser
-    parser = BooleanParser()
+    parser = NumpyParser()
     print numpy.where(parser.parse(expr, X=X, Y=Y), 1.0, 0.0)

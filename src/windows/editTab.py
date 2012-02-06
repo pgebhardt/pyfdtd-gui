@@ -41,24 +41,20 @@ class EditTab(QtGui.QWidget):
             type_ = self.newLayerDialog.typeComboBox.currentText()
             mask = self.newLayerDialog.maskEdit.text()
             function = self.newLayerDialog.functionEdit.text()
-            er = float(self.newLayerDialog.rEdit.text())
-            mur = float(self.newLayerDialog.rEdit.text())
-            sigma = float(self.newLayerDialog.sigmaEdit.text())
             x = float(self.newLayerDialog.xEdit.text())
             y = float(self.newLayerDialog.yEdit.text())
 
             # create new Layer
-            self.new_layer(name, type_, mask, function=function, er=er,
-                    mur=mur, sigma=sigma, x=x, y=y)
+            self.new_layer(name, type_, mask, function=function, x=x, y=y)
 
             # add to job
             if type_ == 'Electric':
                 self.mainwindow.job.material['electric'].append(
-                        [name, mask, er, sigma])
+                        [name, mask, function])
 
             elif type_ == 'Magnetic':
                 self.mainwindow.job.material['magnetic'].append(
-                        [name, mask, mur, sigma])
+                        [name, mask, function])
 
             elif type_ == 'Source':
                 self.mainwindow.job.source.append([name, mask, function])
@@ -111,11 +107,11 @@ class EditTab(QtGui.QWidget):
         self.init_tree()
 
         # update materials
-        for name, mask, er, sigma in self.mainwindow.job.material['electric']:
-            self.new_layer(name, 'Electric', mask, er=er, sigma=sigma)
+        for name, mask, function in self.mainwindow.job.material['electric']:
+            self.new_layer(name, 'Electric', mask, function)
 
-        for name, mask, mur, sigma in self.mainwindow.job.material['magnetic']:
-            self.new_layer(name, 'Magnetic', mask, mur=mur, sigma=sigma)
+        for name, mask, function in self.mainwindow.job.material['magnetic']:
+            self.new_layer(name, 'Magnetic', mask, function)
 
         # update sources
         for name, mask, function in self.mainwindow.job.source:
@@ -129,19 +125,16 @@ class EditTab(QtGui.QWidget):
         self.plot.update()
         self.mainwindow.playTab.update()
 
-    def new_layer(self, name, type_, mask=None, function=None, er=1.0, mur=1.0,
-            sigma=0.0, x=0.0, y=0.0):
+    def new_layer(self, name, type_, mask=None, function=None, x=0.0, y=0.0):
         # create layer
         try:
             if type_ == 'Electric':
                 QtGui.QTreeWidgetItem(self.layerItems[0],
-                        [name, mask,
-                            'epsilon(er={}, sigma={})'.format(er, sigma)])
+                        [name, mask, function])
 
             elif type_ == 'Magnetic':
                 QtGui.QTreeWidgetItem(self.layerItems[1],
-                        [name, mask,
-                            'mu(mur={}, sigma={})'.format(mur, sigma)])
+                        [name, mask, function])
 
             elif type_ == 'Source':
                 QtGui.QTreeWidgetItem(self.layerItems[2],

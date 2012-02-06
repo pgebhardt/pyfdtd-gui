@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
 from PySide import QtGui
-from plugins import BooleanParser
+import plugins
 
 
 class matplotlibCanvas(FigureCanvas):
@@ -62,7 +62,7 @@ class Plot(QtGui.QWidget):
         deltaX, deltaY = self.mainwindow.job.config['delta']
 
         # create parser
-        parser = BooleanParser()
+        parser = plugins.NumpyParser()
 
         # get meshgrid
         x, y = numpy.meshgrid(numpy.arange(0.0, sizeX, deltaX),
@@ -84,12 +84,12 @@ class Plot(QtGui.QWidget):
         self.listener = numpy.zeros(self.masks.shape)
 
         # get electric layer
-        for name, mask, er, sigma in self.mainwindow.job.material['electric']:
+        for name, mask, function in self.mainwindow.job.material['electric']:
             self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
                     1.0, 0.0)
 
         # get magnetic layer
-        for name, mask, mur, sigma in self.mainwindow.job.material['magnetic']:
+        for name, mask, function in self.mainwindow.job.material['magnetic']:
             self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
                     1.0, 0.0)
 
