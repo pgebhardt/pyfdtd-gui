@@ -1,2 +1,2 @@
 from functionparser import *
-from numpyparser import BooleanParser
+from numpyparser import *
