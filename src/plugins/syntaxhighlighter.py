@@ -24,7 +24,7 @@ from PySide.QtCore import *
 
 
 class MyHighlighter(QSyntaxHighlighter):
-    def __init__(self, parent, theme):
+    def __init__(self, parent):
         QSyntaxHighlighter.__init__(self, parent)
 
         self.parent = parent
@@ -156,7 +156,7 @@ class TestApp(QMainWindow):
         font.setPointSize(10)
         editor = QTextEdit()
         editor.setFont(font)
-        highlighter = MyHighlighter(editor, "Classic")
+        highlighter = MyHighlighter(editor.document())
         self.setCentralWidget(editor)
         self.setWindowTitle("Syntax Highlighter")
 
