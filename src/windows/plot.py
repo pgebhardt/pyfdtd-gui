@@ -56,13 +56,15 @@ class Plot(QtGui.QWidget):
         self.update()
 
     def update(self):
+        # get parameter
+        sizeX, sizeY = self.simulation.field.size
+
         # redraw im
         self.im = self.canvas.axes.imshow(
                 numpy.fabs(numpy.transpose(
                     self.simulation.field.oddFieldX['field'])),
                 norm=colors.Normalize(0.0, 10.0),
-                extent=[0.0, self.simulation.field.xSize,
-                    self.simulation.field.ySize, 0.0])
+                extent=[0.0, sizeX, sizeY, 0.0])
         self.canvas.axes.grid(True)
 
         # cummulate all layer masks

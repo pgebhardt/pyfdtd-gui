@@ -113,10 +113,9 @@ class EditTab(QtGui.QWidget):
         self.init_tree()
 
         # create new simulation
-        xSize, ySize = self.mainwindow.job.config['size']
-        deltaX, deltaY = self.mainwindow.job.config['delta']
         self.mainwindow.simulation = pyfdtd.solver(
-                pyfdtd.field(xSize, ySize, deltaX, deltaY))
+                pyfdtd.field(self.mainwindow.job.config['size'],
+                    self.mainwindow.job.config['delta']))
 
         # update materials
         for name, mask, er, sigma in self.mainwindow.job.material['electric']:

@@ -16,7 +16,8 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
 
         # init simulation
-        self.simulation = pyfdtd.solver(pyfdtd.field(0.4, 0.4, 0.001))
+        self.simulation = pyfdtd.solver(pyfdtd.field(
+            (0.4, 0.4), (0.001, 0.001)))
         self.job = jobs.Job()
 
         # initialize gui elements
@@ -122,15 +123,19 @@ class MainWindow(QtGui.QMainWindow):
         self.newSimDialog = dialogs.NewSimulation()
         self.newSimDialog.okButton.clicked.connect(new_simulation)
 
+        # get parameter
+        sizeX, sizeY = self.job.config['size']
+        deltaX, deltaY = self.job.config['delta']
+
         # set settings
         self.newSimDialog.xSizeEdit.setText(
-                '{}'.format(self.simulation.field.xSize))
+                '{}'.format(sizeX))
         self.newSimDialog.ySizeEdit.setText(
-                '{}'.format(self.simulation.field.ySize))
+                '{}'.format(sizeY))
         self.newSimDialog.deltaXEdit.setText(
-                '{}'.format(self.simulation.field.deltaX))
+                '{}'.format(deltaX))
         self.newSimDialog.deltaYEdit.setText(
-                '{}'.format(self.simulation.field.deltaY))
+                '{}'.format(deltaY))
 
         # show dialog
         self.newSimDialog.show()
