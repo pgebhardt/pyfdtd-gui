@@ -1,37 +1,62 @@
 import numpy
+import string
 
 
 class BooleanParser:
     def __init__(self):
         pass
 
-    def parse(self, expression, **kargs):
-        # split expression
-        words = expression.split()
+    def parse(self, expr, **kargs):
+        # try parse and
+        self.parse_and(expr, None, kargs)
 
-        # look for keywords
-        count_and = words.count('and')
-        count_or = words.count('or')
-        count_xor = words.count('xor')
+    def parse_not(self, expr, x, kargs):
+        pass
 
-        # create x1
-        x1 = ''
-        for i in range(0, words.index('and')):
-            x1 += words[i] + ' '
+    def parse_and(self, x1, x2, kargs):
+        # check type of x1
+        if isinstance(x1, str):
+            expressions = x1.split('and')
 
-        # create x2
-        x2 = ''
-        for j in range(i + 2, len(words)):
-            x2 += words[j] + ' '
+            # check for length of expressions
+            if len(expressions) > 1:
+                x1 = self.parse_and(expressions[0],
+                        string.join(expressions[1:]), kargs)
 
-        # return value
-        return self.and_(eval(x1, kargs), eval(x2, kargs))
+            if x1 == None:
+                x1 = ''
 
-    # operators
-    and_ = numpy.logical_and
-    or_ = numpy.logical_or
-    not_ = numpy.logical_not
-    xor_ = numpy.logical_xor
+        # check type of x2
+        if isinstance(x2, str):
+            expressions = x2.split('and')
+
+            # check for length of expressions
+            if len(expressions) > 1:
+                x1 = self.parse_and(expressions[0],
+                        string.join(expressions[1:]), kargs)
+
+            if x2 == None:
+                x2 = ''
+
+        # evaluate
+        if isinstance(x1, str):
+            x1 = eval(x1, kargs)
+
+        if isinstance(x2, str):
+            x2 = eval(x2, kargs)
+
+        if x2 == None:
+            return x1
+
+        else:
+            return numpy.logical_and(x1, x2)
+
+    def parse_or(self, x1, x2, kargs):
+        pass
+
+    def parse_xor(self, x1, x2, kargs):
+        pass
+
 
 if __name__ == '__main__':
     expr = 'X > 2 and Y > 4'
