@@ -7,6 +7,7 @@ from evalTab import EvalTab
 from editTab import EditTab
 from playTab import PlayTab
 import simulation
+import plugins
 
 
 # Main window for pyfdtd-gui application
@@ -115,8 +116,7 @@ class MainWindow(QtGui.QMainWindow):
                     float(self.newSimDialog.deltaYEdit.text()))
 
             # update edit tab
-            self.editTab.update_job()
-            self.editTab.update_plot()
+            self.editTab.update()
             self.playTab.update()
 
         # create dialog
@@ -154,8 +154,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.job.config['size'], self.job.config['delta']))
 
             # update edit tab
-            self.editTab.update_job()
-            self.editTab.update_plot()
+            self.editTab.update()
             self.playTab.update()
 
     def save_simulation(self):
@@ -202,6 +201,34 @@ class MainWindow(QtGui.QMainWindow):
         def finished():
             self.updateTimer.stop()
             self.progressBar.setValue(100.0)
+
+        # create parser
+        parser = plugins.BooleanParser()
+
+        # init simulation
+        self.simulation = pyfdtd.solver(pyfdtd.field(
+            self.job.config['size'], self.job.config['delta']))
+
+        # get meshgrid
+        x, y = self.simulation.material['electric'].meshgrid
+
+        # create materials
+        for name, mask, er, sigma in self.job.material['electric']:
+            self.simulation.material['electric'][parser.parse(str(mask),
+                x=x, y=y)] = pyfdtd.material.epsilon(er, sigma)
+
+        for name, mask, mur, sigma in self.job.material['magnetic']:
+            self.simulation.material['magnetic'][parser.parse(str(mask),
+                x=x, y=y)] = pyfdtd.material.mu(mur, sigma)
+
+        # create sources
+        for name, mask, function in self.job.source:
+            self.simulation.source[parser.parse(str(mask),
+                x=x, y=y)] = plugins.source_from_string(function)
+
+        # create listener
+        for name, x, y in self.job.listener:
+            self.simulation.listener.append(pyfdtd.listener(x, y))
 
         # create simulation thread
         self.simulationThread = simulation.SimulationThread(self)

@@ -1,6 +1,4 @@
 from PySide import QtGui
-import pyfdtd
-from plugins import mask_from_string, source_from_string
 import dialogs
 from plot import Plot
 
@@ -108,14 +106,9 @@ class EditTab(QtGui.QWidget):
         self.layerItems.append(QtGui.QTreeWidgetItem(None, ['Listener']))
         self.treeWidget.addTopLevelItems(self.layerItems)
 
-    def update_job(self):
+    def update(self):
         # clear editTab tree
         self.init_tree()
-
-        # create new simulation
-        self.mainwindow.simulation = pyfdtd.solver(
-                pyfdtd.field(self.mainwindow.job.config['size'],
-                    self.mainwindow.job.config['delta']))
 
         # update materials
         for name, mask, er, sigma in self.mainwindow.job.material['electric']:
@@ -136,40 +129,25 @@ class EditTab(QtGui.QWidget):
         self.plot.update()
         self.mainwindow.playTab.update()
 
-    def update_plot(self):
-        # update plot
-        self.plot.simulation = self.mainwindow.simulation
-        self.plot.update()
-
     def new_layer(self, name, type_, mask=None, function=None, er=1.0, mur=1.0,
             sigma=0.0, x=0.0, y=0.0):
         # create layer
         try:
             if type_ == 'Electric':
-                self.mainwindow.simulation.material['electric'][
-                        mask_from_string(mask)] = \
-                                pyfdtd.material.epsilon(er=er, sigma=sigma)
                 QtGui.QTreeWidgetItem(self.layerItems[0],
                         [name, mask,
                             'epsilon(er={}, sigma={})'.format(er, sigma)])
 
             elif type_ == 'Magnetic':
-                self.mainwindow.simulation.material['electric'][
-                        mask_from_string(mask)] = \
-                               pyfdtd.material.mu(mur=mur, sigma=sigma)
                 QtGui.QTreeWidgetItem(self.layerItems[1],
                         [name, mask,
                             'mu(mur={}, sigma={})'.format(mur, sigma)])
 
             elif type_ == 'Source':
-                self.mainwindow.simulation.source[
-                        mask_from_string(mask)] = source_from_string(function)
                 QtGui.QTreeWidgetItem(self.layerItems[2],
                         [name, mask, function])
 
             elif type_ == 'Listener':
-                self.mainwindow.simulation.listener.append(
-                        pyfdtd.listener(x, y))
                 QtGui.QTreeWidgetItem(self.layerItems[3],
                         [name, 'x={}, y={}'.format(x, y)])
 
