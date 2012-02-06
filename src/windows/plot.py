@@ -58,6 +58,7 @@ class Plot(QtGui.QWidget):
     def update(self):
         # get parameter
         sizeX, sizeY = self.simulation.field.size
+        deltaX, deltaY = self.simulation.field.delta
 
         # redraw im
         self.im = self.canvas.axes.imshow(
@@ -92,8 +93,7 @@ class Plot(QtGui.QWidget):
         # get listener
         for listener in self.simulation.listener:
             x, y = listener.pos
-            self.listener[x / self.simulation.field.deltaX,
-                    y / self.simulation.field.deltaY] = 5.0
+            self.listener[x / deltaX, y / deltaY] = 5.0
 
         # norm masks
         if numpy.max(self.masks) != 0.0:

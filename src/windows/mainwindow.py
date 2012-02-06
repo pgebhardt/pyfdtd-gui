@@ -150,10 +150,8 @@ class MainWindow(QtGui.QMainWindow):
             self.job.load(fname)
 
             # create new simulation
-            xSize, ySize = self.job.config['size']
-            deltaX, deltaY = self.job.config['delta']
             self.simulation = pyfdtd.solver(pyfdtd.field(
-                xSize, ySize, deltaX, deltaY))
+                self.job.config['size'], self.job.config['delta']))
 
             # update edit tab
             self.editTab.update_job()
