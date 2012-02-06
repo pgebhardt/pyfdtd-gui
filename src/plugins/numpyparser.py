@@ -23,9 +23,15 @@ class BooleanParser:
             return self.binary_pareser(x, None, 'and', numpy.logical_and,
                     callback_not, kargs)
 
+        # or callback
+        def callback_or(x, kargs):
+            # parse or
+            return self.binary_pareser(x, None, 'or', numpy.logical_or,
+                    callback_and, kargs)
+
         # try parse or
-        result = self.binary_pareser(expr, None, 'or', numpy.logical_or,
-                callback_and, kargs)
+        result = self.binary_pareser(expr, None, 'xor', numpy.logical_xor,
+                callback_or, kargs)
 
         # return result
         return result
