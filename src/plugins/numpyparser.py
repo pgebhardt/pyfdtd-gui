@@ -8,56 +8,66 @@ class BooleanParser:
 
     def parse(self, expr, **kargs):
         # not parsable callback
-        def callback_not_parasable(x, kargs):
-            print '\"{}\" not parsable'.format(x)
+        def callback_not_parsable(x, kargs):
+            raise ValueError('\"{}\" not parsable'.format(x))
 
         # not callback
         def callback_not(x, kargs):
             # parse not
-            return self.unary_pareser(x, 'not', numpy.logical_not,
-                    callback_not_parasable, kargs)
+            return self.unary_parser(x, 'not', numpy.logical_not,
+                    callback_not_parsable, kargs)
 
         # and callback
         def callback_and(x, kargs):
             # parse and
-            return self.binary_pareser(x, None, 'and', numpy.logical_and,
+            return self.binary_parser(x, None, 'and', numpy.logical_and,
                     callback_not, kargs)
 
         # or callback
         def callback_or(x, kargs):
             # parse or
-            return self.binary_pareser(x, None, 'or', numpy.logical_or,
+            return self.binary_parser(x, None, 'or', numpy.logical_or,
                     callback_and, kargs)
 
-        # try parse or
-        result = self.binary_pareser(expr, None, 'xor', numpy.logical_xor,
-                callback_or, kargs)
+        # xor callback
+        def callback_xor(x, kargs):
+            # parse xor
+            return self.binary_parser(x, None, 'xor', numpy.logical_xor,
+                    callback_or, kargs)
+
+        # try parse brackets
+        result = self.bracket_parser(expr, callback_xor, kargs)
 
         # return result
         return result
 
-    def binary_pareser(self, x1, x2, keyword, function, callback, kargs):
-        print 'input: {}'.format([x1, x2])
+    def bracket_parser(self, expr, callback, kargs):
+        # check for opening bracket
+        if string.find(expr, '(') != -1:
+            print 'opening backet at pos: {}'.format(string.find(expr, '('))
 
+        else:
+            # call callback
+            return callback(expr, kargs)
+
+    def binary_parser(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
         if isinstance(x1, str):
             expressions = x1.split(keyword)
-            print 'x1: {}'.format(expressions)
 
             # check for length of expressions
             if len(expressions) > 1:
-                x1 = self.binary_pareser(string.strip(expressions[0]),
+                x1 = self.binary_parser(string.strip(expressions[0]),
                         string.strip(string.join(expressions[1:], keyword)),
                         keyword, function, callback, kargs)
 
         # check type of x2
         if isinstance(x2, str):
             expressions = x2.split(keyword)
-            print 'x2: {}'.format(expressions)
 
             # check for length of expressions
             if len(expressions) > 1:
-                x2 = self.binary_pareser(string.strip(expressions[0]),
+                x2 = self.binary_parser(string.strip(expressions[0]),
                         string.strip(string.join(expressions[1:], keyword)),
                         keyword, function, callback, kargs)
 
@@ -97,16 +107,12 @@ class BooleanParser:
             result = function(x1, x2)
 
         # return
-        print 'result: {}'.format(result)
         return result
 
-    def unary_pareser(self, x1, keyword, function, callback, kargs):
-        print 'input: {}'.format(x1)
-
+    def unary_parser(self, x1, keyword, function, callback, kargs):
         # check type of x1
         if isinstance(x1, str):
             expressions = x1.split(keyword)
-            print 'x1: {}'.format(expressions)
 
             # check for length of expressions
             if len(expressions) != 2:
@@ -142,15 +148,13 @@ class BooleanParser:
 
         # evaluate
         x1 = evaluate(x1)
-        print x1
         result = function(x1)
 
         # return
-        print 'result: {}'.format(result)
         return result
 
 if __name__ == '__main__':
-    expr = 'not X == 2'
+    expr = 'X > 5 or X < 2 and Y > 2'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 10.0, 1.0), numpy.arange(0.0, 10.0,
         1.0))
