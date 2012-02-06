@@ -67,6 +67,8 @@ class Plot(QtGui.QWidget):
         # get meshgrid
         x, y = numpy.meshgrid(numpy.arange(0.0, sizeX, deltaX),
                 numpy.arange(0.0, sizeY, deltaY))
+        x = x.transpose()
+        y = y.transpose()
 
         # redraw im
         self.im = self.canvas.axes.imshow(
@@ -82,6 +84,7 @@ class Plot(QtGui.QWidget):
         self.listener = numpy.zeros(self.masks.shape)
 
         # get electric layer
+        print parser.parse(str('x < 0.3'), x=x, y=y).shape
         for name, mask, er, sigma in self.job.material['electric']:
             self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
                     1.0, 0.0)
