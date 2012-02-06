@@ -154,10 +154,10 @@ class BooleanParser:
         return result
 
 if __name__ == '__main__':
-    expr = 'X > 5 or X < 2 and Y > 2'
+    expr = 'X < 0.5'
 
-    X, Y = numpy.meshgrid(numpy.arange(0.0, 10.0, 1.0), numpy.arange(0.0, 10.0,
-        1.0))
+    X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1), numpy.arange(0.0, 1.0,
+        0.1))
 
     # create parser
     parser = BooleanParser()

@@ -64,6 +64,10 @@ class Plot(QtGui.QWidget):
         # create parser
         parser = BooleanParser()
 
+        # get meshgrid
+        x, y = numpy.meshgrid(numpy.arange(0.0, sizeX, deltaX),
+                numpy.arange(0.0, sizeY, deltaY))
+
         # redraw im
         self.im = self.canvas.axes.imshow(
                 numpy.fabs(numpy.transpose(
@@ -79,15 +83,18 @@ class Plot(QtGui.QWidget):
 
         # get electric layer
         for name, mask, er, sigma in self.job.material['electric']:
-            self.masks += numpy.where(parser.parser(mask), 1.0, 0.0)
+            self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
+                    1.0, 0.0)
 
         # get magnetic layer
         for name, mask, mur, sigma in self.job.material['magnetic']:
-            self.masks += numpy.where(parser.parser(mask), 1.0, 0.0)
+            self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
+                    1.0, 0.0)
 
         # get sources
         for name, mask, function in self.job.source:
-            self.sources += numpy.where(parser.parser(mask), 1.0, 0.0)
+            self.sources += numpy.where(parser.parse(str(mask), x=x, y=y),
+                    1.0, 0.0)
 
         # get listener
         for name, x, y in self.job.listener:
