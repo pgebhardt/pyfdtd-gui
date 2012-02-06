@@ -59,8 +59,12 @@ class BooleanParser:
             if isinstance(x, str):
                 try:
                     x = eval(x, kargs)
-                except ValueError:
-                    x = callback(x, kargs)
+                except ValueError as e:
+                    # if evaluation does not work call callback
+                    if callback:
+                        x = callback(x, kargs)
+                    else:
+                        raise e
 
             # check for numpy array
             elif isinstance(x, numpy.ndarray):
@@ -74,15 +78,55 @@ class BooleanParser:
         # evaluate
         x1 = evaluate(x1)
         if x2 == None:
-            return x1
+            result = x1
 
-        x2 = evaluate(x2)
+        else:
+            x2 = evaluate(x2)
+            result = function(x1, x2)
 
         # return
-        return function(x1, x2)
+        print 'result: {}'.format(result)
+        return result
+
+    def unary_pareser(self, x1, keyword, function, callback, kargs):
+        print 'input: {}'.format(x1)
+
+        # evaluate
+        def evaluate(x):
+            # check for list
+            if isinstance(x, list):
+                x = x[0]
+
+            # check for string
+            if isinstance(x, str):
+                try:
+                    x = eval(x, kargs)
+                except ValueError as e:
+                    # if evaluation does not work call callback
+                    if callback:
+                        x = callback(x, kargs)
+                    else:
+                        raise e
+
+            # check for numpy array
+            elif isinstance(x, numpy.ndarray):
+                pass
+
+            else:
+                raise ValueError('x is invalid: ' + str(x))
+
+            return x
+
+        # evaluate
+        x1 = evaluate(x1)
+        result = function(x1)
+
+        # return
+        print 'result: {}'.format(result)
+        return result
 
 if __name__ == '__main__':
-    expr = 'X > 2 and X < 4 or X > 6 and X < 9'
+    expr = 'X > 2 and X < 5 and Y > 1 and Y < 6'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 10.0, 1.0), numpy.arange(0.0, 10.0,
         1.0))
