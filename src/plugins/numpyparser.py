@@ -7,14 +7,24 @@ class BooleanParser:
         pass
 
     def parse(self, expr, **kargs):
-        # try parse and
-        result = self.generic_pareser(expr, None, 'and', numpy.logical_and,
-                kargs)
+        # not callback
+        def callback_not(x, kargs):
+            pass
+
+        # and callback
+        def callback_and(x, kargs):
+            # parse and
+            return self.binary_pareser(x, None, 'and', numpy.logical_and,
+                    callback_not, kargs)
+
+        # try parse or
+        result = self.binary_pareser(expr, None, 'or', numpy.logical_or,
+                callback_and, kargs)
 
         # return result
         return result
 
-    def binary_pareser(self, x1, x2, keyword, function, kargs):
+    def binary_pareser(self, x1, x2, keyword, function, callback, kargs):
         print 'input: {}'.format([x1, x2])
 
         # check type of x1
@@ -26,18 +36,18 @@ class BooleanParser:
             if len(expressions) > 1:
                 x1 = self.binary_pareser(string.strip(expressions[0]),
                         string.strip(string.join(expressions[1:], keyword)),
-                        keyword, function, kargs)
+                        keyword, function, callback, kargs)
 
         # check type of x2
         if isinstance(x2, str):
-            expressions = x2.split('and')
+            expressions = x2.split(keyword)
             print 'x2: {}'.format(expressions)
 
             # check for length of expressions
             if len(expressions) > 1:
                 x2 = self.binary_pareser(string.strip(expressions[0]),
                         string.strip(string.join(expressions[1:], keyword)),
-                        keyword, function, kargs)
+                        keyword, function, callback, kargs)
 
         # evaluate
         def evaluate(x):
@@ -47,7 +57,10 @@ class BooleanParser:
 
             # check for string
             if isinstance(x, str):
-                x = eval(x, kargs)
+                try:
+                    x = eval(x, kargs)
+                except ValueError:
+                    x = callback(x, kargs)
 
             # check for numpy array
             elif isinstance(x, numpy.ndarray):
@@ -69,7 +82,7 @@ class BooleanParser:
         return function(x1, x2)
 
 if __name__ == '__main__':
-    expr = 'X > 2 and X < 4'
+    expr = 'X > 2 and X < 4 or X > 6 and X < 9'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 10.0, 1.0), numpy.arange(0.0, 10.0,
         1.0))
