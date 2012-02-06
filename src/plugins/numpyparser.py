@@ -8,58 +8,68 @@ class BooleanParser:
 
     def parse(self, expr, **kargs):
         # try parse and
-        self.parse_and(expr, None, kargs)
+        result = self.generic_pareser(expr, None, 'and', numpy.logical_and,
+                kargs)
 
-    def parse_not(self, expr, x, kargs):
-        pass
+        # return result
+        return result
 
-    def parse_and(self, x1, x2, kargs):
+    def binary_pareser(self, x1, x2, keyword, function, kargs):
+        print 'input: {}'.format([x1, x2])
+
         # check type of x1
         if isinstance(x1, str):
-            expressions = x1.split('and')
+            expressions = x1.split(keyword)
+            print 'x1: {}'.format(expressions)
 
             # check for length of expressions
             if len(expressions) > 1:
-                x1 = self.parse_and(expressions[0],
-                        string.join(expressions[1:]), kargs)
-
-            if x1 == None:
-                x1 = ''
+                x1 = self.binary_pareser(string.strip(expressions[0]),
+                        string.strip(string.join(expressions[1:], keyword)),
+                        keyword, function, kargs)
 
         # check type of x2
         if isinstance(x2, str):
             expressions = x2.split('and')
+            print 'x2: {}'.format(expressions)
 
             # check for length of expressions
             if len(expressions) > 1:
-                x1 = self.parse_and(expressions[0],
-                        string.join(expressions[1:]), kargs)
-
-            if x2 == None:
-                x2 = ''
+                x2 = self.binary_pareser(string.strip(expressions[0]),
+                        string.strip(string.join(expressions[1:], keyword)),
+                        keyword, function, kargs)
 
         # evaluate
-        if isinstance(x1, str):
-            x1 = eval(x1, kargs)
+        def evaluate(x):
+            # check for list
+            if isinstance(x, list):
+                x = x[0]
 
-        if isinstance(x2, str):
-            x2 = eval(x2, kargs)
+            # check for string
+            if isinstance(x, str):
+                x = eval(x, kargs)
 
+            # check for numpy array
+            elif isinstance(x, numpy.ndarray):
+                pass
+
+            else:
+                raise ValueError('x is invalid: ' + str(x))
+
+            return x
+
+        # evaluate
+        x1 = evaluate(x1)
         if x2 == None:
             return x1
 
-        else:
-            return numpy.logical_and(x1, x2)
+        x2 = evaluate(x2)
 
-    def parse_or(self, x1, x2, kargs):
-        pass
-
-    def parse_xor(self, x1, x2, kargs):
-        pass
-
+        # return
+        return function(x1, x2)
 
 if __name__ == '__main__':
-    expr = 'X > 2 and Y > 4'
+    expr = 'X > 2 and X < 4'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 10.0, 1.0), numpy.arange(0.0, 10.0,
         1.0))
