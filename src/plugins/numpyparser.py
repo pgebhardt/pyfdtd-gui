@@ -4,7 +4,9 @@ import string
 
 class BooleanParser:
     def __init__(self):
-        pass
+        # define globals
+        self.globals_ = {'sin': numpy.sin, 'cos': numpy.cos, 'exp': numpy.exp,
+                'log': numpy.log, 'pi': numpy.pi}
 
     def parse(self, expr, **kargs):
         # not parsable callback
@@ -29,26 +31,12 @@ class BooleanParser:
             return self.binary_parser(x, None, 'or', numpy.logical_or,
                     callback_and, kargs)
 
-        # xor callback
-        def callback_xor(x, kargs):
-            # parse xor
-            return self.binary_parser(x, None, 'xor', numpy.logical_xor,
-                    callback_or, kargs)
-
-        # try parse brackets
-        result = self.bracket_parser(expr, callback_xor, kargs)
+        # try parse xor
+        result = self.binary_parser(expr, None, 'xor', numpy.logical_xor,
+                callback_or, kargs)
 
         # return result
         return result
-
-    def bracket_parser(self, expr, callback, kargs):
-        # check for opening bracket
-        if string.find(expr, '(') != -1:
-            print 'opening backet at pos: {}'.format(string.find(expr, '('))
-
-        else:
-            # call callback
-            return callback(expr, kargs)
 
     def binary_parser(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
@@ -80,7 +68,8 @@ class BooleanParser:
             # check for string
             if isinstance(x, str):
                 try:
-                    x = eval(x, kargs)
+                    x = eval(x, self.globals_, kargs)
+
                 except ValueError as e:
                     # if evaluation does not work call callback
                     if callback:
@@ -129,7 +118,7 @@ class BooleanParser:
             # check for string
             if isinstance(x, str):
                 try:
-                    x = eval(x, kargs)
+                    x = eval(x, self.globals_, kargs)
                 except ValueError as e:
                     # if evaluation does not work call callback
                     if callback:
@@ -154,10 +143,10 @@ class BooleanParser:
         return result
 
 if __name__ == '__main__':
-    expr = 'X < 0.5'
+    expr = 'sin(X) > 0.1'
 
-    X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1), numpy.arange(0.0, 1.0,
-        0.1))
+    X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1),
+            numpy.arange(0.0, 1.0, 0.1))
 
     # create parser
     parser = BooleanParser()

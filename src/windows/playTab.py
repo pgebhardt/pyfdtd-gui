@@ -29,7 +29,7 @@ class PlayTab(QtGui.QWidget):
         self.setLayout(grid)
 
         # create plot
-        self.plot = Plot(self.mainwindow.job)
+        self.plot = Plot(self.mainwindow)
 
         # create buttons
         buttonGrid = QtGui.QGridLayout()

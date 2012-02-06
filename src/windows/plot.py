@@ -34,12 +34,12 @@ class matplotlibCanvas(FigureCanvas):
 
 
 class Plot(QtGui.QWidget):
-    def __init__(self, job, parent=None):
+    def __init__(self, mainwindow, parent=None):
         # call base class constructor
         super(Plot, self).__init__()
 
-        # save simulation
-        self.job = job
+        # save mainwindw
+        self.mainwindow = mainwindow
 
         # create canvas
         self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
@@ -58,8 +58,8 @@ class Plot(QtGui.QWidget):
 
     def update(self):
         # get parameter
-        sizeX, sizeY = self.job.config['size']
-        deltaX, deltaY = self.job.config['delta']
+        sizeX, sizeY = self.mainwindow.job.config['size']
+        deltaX, deltaY = self.mainwindow.job.config['delta']
 
         # create parser
         parser = BooleanParser()
@@ -67,6 +67,8 @@ class Plot(QtGui.QWidget):
         # get meshgrid
         x, y = numpy.meshgrid(numpy.arange(0.0, sizeX, deltaX),
                 numpy.arange(0.0, sizeY, deltaY))
+        x = x.transpose()
+        y = y.transpose()
 
         # redraw im
         self.im = self.canvas.axes.imshow(
@@ -82,22 +84,22 @@ class Plot(QtGui.QWidget):
         self.listener = numpy.zeros(self.masks.shape)
 
         # get electric layer
-        for name, mask, er, sigma in self.job.material['electric']:
+        for name, mask, er, sigma in self.mainwindow.job.material['electric']:
             self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
                     1.0, 0.0)
 
         # get magnetic layer
-        for name, mask, mur, sigma in self.job.material['magnetic']:
+        for name, mask, mur, sigma in self.mainwindow.job.material['magnetic']:
             self.masks += numpy.where(parser.parse(str(mask), x=x, y=y),
                     1.0, 0.0)
 
         # get sources
-        for name, mask, function in self.job.source:
+        for name, mask, function in self.mainwindow.job.source:
             self.sources += numpy.where(parser.parse(str(mask), x=x, y=y),
                     1.0, 0.0)
 
         # get listener
-        for name, x, y in self.job.listener:
+        for name, x, y in self.mainwindow.job.listener:
             self.listener[x / deltaX, y / deltaY] = 5.0
 
         # norm masks
