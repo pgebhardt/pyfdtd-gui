@@ -22,7 +22,6 @@ class matplotlibCanvas(FigureCanvas):
         # get background color
         r, g, b, a = palette.color(QtGui.QPalette.Window.Background).toTuple()
         r, g, b, a = map(lambda x: x / 250.0, (r, g, b, a))
-        print r, g, b, a
 
         # create figure
         fig = Figure(figsize=(width, height), dpi=dpi, facecolor=(r, g, b))
@@ -33,10 +32,12 @@ class matplotlibCanvas(FigureCanvas):
         # We want the axes cleared every time plot() is called
         self.axes.hold(False)
 
+        # set title
         if title != None:
             fig.suptitle(title, fontsize=12)
 
-        FigureCanvas.__init__(self, fig)
+        # call base class constructor
+        super(matplotlibCanvas, self).__init__(fig)
         self.setParent(parent)
 
         FigureCanvas.setSizePolicy(self, QtGui.QSizePolicy.Expanding,
@@ -92,6 +93,12 @@ class Plot(QtGui.QWidget):
                     numpy.zeros((sizeX / deltaX, sizeY / deltaY)))),
                 norm=colors.Normalize(0.0, 10.0),
                 extent=[0.0, sizeX, sizeY, 0.0])
+
+        # set label
+        self.canvas.axes.set_xlabel('X')
+        self.canvas.axes.set_ylabel('Y')
+
+        # set grid
         self.canvas.axes.grid(True)
 
         # cummulate all layer masks
