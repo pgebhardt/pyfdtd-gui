@@ -76,6 +76,23 @@ class EditTab(QtGui.QWidget):
 
             # delete layer from tree and job
             if not currentItem is None and not parent is None:
+                # delete layer from job
+                index = parent.indexOfChild(currentItem)
+                type_ = parent.text(0)
+
+                if type_ == 'Electric':
+                    self.mainwindow.job.material['electric'].remove(
+                            self.mainwindow.job.material['electric'][index])
+                elif type_ == 'Magnetic':
+                    self.mainwindow.job.material['magnetic'].remove(
+                            self.mainwindow.job.material['magnetic'][index])
+                elif type_ == 'Source':
+                    self.mainwindow.job.source.remove(
+                            self.mainwindow.job.source[index])
+                elif type_ == 'Listener':
+                    self.mainwindow.job.listener.remove(
+                            self.mainwindow.job.listener[index])
+
                 # delete layer from tree
                 parent.removeChild(currentItem)
 
