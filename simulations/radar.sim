@@ -13,8 +13,25 @@ p4
 F0.4
 tp5
 s.(lp0
-.(lp0
-.(dp0
+(lp1
+Vreceiver 1
+p2
+aF0.05
+aF0.01
+aa(lp3
+Vreceiver 2
+p4
+aF0.15
+aF0.01
+aa.(lp0
+(lp1
+Vsource
+p2
+aV(x-0.1)**2 / 0.005**2 + (y-0.01)**2 / 0.001**2 < 1.0
+p3
+aVpulse(amplitude=2e2, width=200e-12, freq=7.5e9, offset=1e-9)
+p4
+aa.(dp0
 S'magnetic'
 p1
 (lp2
@@ -29,7 +46,7 @@ p7
 aVepsilon(sigma=59.1e6)
 p8
 aa(lp9
-Vdielectric plane
+Vdielectric layer
 p10
 aVy >= 0.002 and y < 0.008
 p11
@@ -38,22 +55,29 @@ p12
 aa(lp13
 Vantenna 1
 p14
-aVx >= 0.04 and x <= 0.06 and y >= 0.008 and y < 0.01
+aVx >= 0.045 and x <= 0.055 and y >= 0.008 and y < 0.01
 p15
 aVepsilon(sigma=59.1e6)
 p16
 aa(lp17
 Vantenna 2
 p18
-aVx >= 0.09 and x <= 0.11 and y >= 0.008 and y < 0.01
+aVx >= 0.095 and x <= 0.105 and y >= 0.008 and y < 0.01
 p19
 aVepsilon(sigma=59.1e6)
 p20
 aa(lp21
 Vantenna 3
 p22
-aVx >= 0.14 and x <= 0.16 and y >= 0.008 and y < 0.01
+aVx >= 0.145 and x <= 0.155 and y >= 0.008 and y < 0.01
 p23
 aVepsilon(sigma=59.1e6)
 p24
+aa(lp25
+Vobject
+p26
+aV(x-0.05)**2 + (y-0.35)**2 < 0.025**2
+p27
+aVepsilon(sigma=59.1e6)
+p28
 aas.

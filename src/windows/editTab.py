@@ -96,6 +96,9 @@ class EditTab(QtGui.QWidget):
                 # delete layer from tree
                 parent.removeChild(currentItem)
 
+                # update plot
+                self.plot.update()
+
         # create button grid
         buttonGrid = QtGui.QGridLayout()
 
