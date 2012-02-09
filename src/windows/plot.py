@@ -49,9 +49,14 @@ class Plot(QtGui.QWidget):
 
         # create layout
         grid = QtGui.QGridLayout()
+        self.setLayout(grid)
+
+        # set content margin
+        grid.setContentsMargins(0, 0, 0, 0)
+
+        # add widgets
         grid.addWidget(self.canvas, 0, 0)
         grid.addWidget(self.toolbar, 1, 0)
-        self.setLayout(grid)
 
         # plot once
         self.update()
