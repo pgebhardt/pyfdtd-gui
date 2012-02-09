@@ -215,11 +215,11 @@ class MainWindow(QtGui.QMainWindow):
         # create materials
         for name, mask, function in self.job.material['electric']:
             self.simulation.material['electric'][parser.parse(str(mask),
-                x=x, y=y)] = plugins.source_from_string(function)
+                x=x, y=y)] = plugins.material_from_string(function)
 
         for name, mask, function in self.job.material['magnetic']:
             self.simulation.material['magnetic'][parser.parse(str(mask),
-                x=x, y=y)] = plugins.source_from_string(function)
+                x=x, y=y)] = plugins.material_from_string(function)
 
         # create sources
         for name, mask, function in self.job.source:
