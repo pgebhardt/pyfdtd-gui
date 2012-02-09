@@ -42,7 +42,7 @@ class Plot(QtGui.QWidget):
         self.mainwindow = mainwindow
 
         # create canvas
-        self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72, title='Domain')
+        self.canvas = matplotlibCanvas(None, 5.0, 5.0, dpi=72)
 
         # create toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
