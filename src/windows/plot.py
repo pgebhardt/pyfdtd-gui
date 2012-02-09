@@ -16,7 +16,18 @@ import plugins
 class matplotlibCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
     def __init__(self, parent=None, width=8, height=4, dpi=100, title=None):
-        fig = Figure(figsize=(width, height), dpi=dpi)
+        # create palette object
+        palette = QtGui.QPalette()
+
+        # get background color
+        r, g, b, a = palette.color(QtGui.QPalette.Window.Background).toTuple()
+        r, g, b, a = map(lambda x: x / 250.0, (r, g, b, a))
+        print r, g, b, a
+
+        # create figure
+        fig = Figure(figsize=(width, height), dpi=dpi, facecolor=(r, g, b))
+
+        # create single plot
         self.axes = fig.add_subplot(111)
 
         # We want the axes cleared every time plot() is called
