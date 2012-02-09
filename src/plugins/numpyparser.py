@@ -9,6 +9,10 @@ class NumpyParser:
                 'log': numpy.log}
 
     def parse(self, expr, **kargs):
+        # parse brackets
+        return self.brackets(expr, self.parse_operators, kargs)
+
+    def parse_operators(self, expr, kargs):
         # not parsable callback
         def callback_not_parsable(x, kargs):
             raise ValueError('\"{}\" not parsable'.format(x))
@@ -37,6 +41,23 @@ class NumpyParser:
 
         # return result
         return result
+
+    def brackets(self, expr, callback, kargs):
+        # find first closing bracket
+        closingBracket = expr.find(')')
+
+        # find corresponding opening bracket
+        openingBracket = expr.rfind('(', 0, closingBracket)
+        print openingBracket, closingBracket
+
+        # check for a valid bracket
+        if openingBracket != -1 and (expr[openingBracket - 1] == '(' or
+                expr[openingBracket - 1] == ' ' or openingBracket == 0):
+            print 'valid brackets'
+
+        else:
+            # return standat
+            return callback(expr, kargs)
 
     def binary_operator(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
@@ -143,7 +164,7 @@ class NumpyParser:
         return result
 
 if __name__ == '__main__':
-    expr = 'sin(X) > 0.1 and sin(Y) > 0.1'
+    expr = '(sin(X) > 0.1 and sin(Y) > 0.1)'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1),
             numpy.arange(0.0, 1.0, 0.1))
