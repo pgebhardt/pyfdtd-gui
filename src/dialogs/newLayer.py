@@ -36,7 +36,7 @@ class NewLayer(QtGui.QWidget):
                                     'Source', 'Listener'])
         self.typeComboBox.currentIndexChanged.connect(self.update_gui)
         self.maskEdit = QtGui.QLineEdit()
-        self.functionEdit = QtGui.QLineEdit()
+        self.functionEdit = QtGui.QLineEdit('epsilon()')
         self.xEdit = QtGui.QLineEdit('0.0')
         self.yEdit = QtGui.QLineEdit('0.0')
 
@@ -88,6 +88,14 @@ class NewLayer(QtGui.QWidget):
             self.maskEdit.show()
             self.functionLabel.show()
             self.functionEdit.show()
+
+            # set standart value fro function
+            if index == 'Electric':
+                self.functionEdit.setText('epsilon()')
+            elif index == 'Magnetic':
+                self.functionEdit.setText('mu()')
+            else:
+                self.functionEdit.setText('pulse()')
 
         elif index == 'Listener':
             # hide

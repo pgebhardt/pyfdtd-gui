@@ -7,7 +7,7 @@ from math import *
 
 def source_from_string(expression):
     # standart pulse function
-    def pulse(amplitude, width, freq, offset=0.0):
+    def pulse(amplitude=1e3, width=200e-12, freq=20e9, offset=1e-9):
         def res(flux, deltaT, t, mem):
             value = amplitude * exp(-(t - offset) ** 2 / (2 * width ** 2)) * \
                     cos(2 * pi * freq * (t - offset))
