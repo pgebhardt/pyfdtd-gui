@@ -1,17 +1,14 @@
-import sys
 from PySide import QtGui
 
 
-class OutputWindow(QtGui.QPlainTextEdit):
+class LogViewer(QtGui.QPlainTextEdit):
+    def __init__(self):
+        # call base class constructor
+        super(LogViewer, self).__init__()
+
+        # set to read only
+        self.setReadOnly(True)
+
     def write(self, txt):
+        # default write method for streaming compatibility
         self.appendPlainText(str(txt))
-
-app = QtGui.QApplication(sys.argv)
-out = OutputWindow()
-sys.stdout = out
-sys.stderr = out
-out.show()
-
-print 'Hallo Welt'
-
-sys.exit(app.exec_())
