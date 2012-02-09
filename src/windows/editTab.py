@@ -66,9 +66,33 @@ class EditTab(QtGui.QWidget):
             self.plot.update()
             self.mainwindow.playTab.update()
 
+        def deleate_layer():
+            # get current layer
+            currentItem = self.treeWidget.currentItem()
+
+            # get parent
+            if not currentItem is None:
+                parent = currentItem.parent()
+
+            # delete layer from tree and job
+            if not currentItem is None and not parent is None:
+                # delete layer from tree
+                parent.removeChild(currentItem)
+
+        # create button grid
+        buttonGrid = QtGui.QGridLayout()
+
         # create new layer button
         newLayerButton = QtGui.QPushButton('New Layer')
         newLayerButton.clicked.connect(new_layer_clicked)
+
+        # create delete layer buttons
+        deleteLayerButton = QtGui.QPushButton('Delete Layer')
+        deleteLayerButton.clicked.connect(deleate_layer)
+
+        # add buttons to grid layout
+        buttonGrid.addWidget(newLayerButton, 0, 0)
+        buttonGrid.addWidget(deleteLayerButton, 0, 1)
 
         # create tree view
         treeGrid = QtGui.QGridLayout()
@@ -87,7 +111,7 @@ class EditTab(QtGui.QWidget):
 
         grid.addWidget(self.plot, 0, 0)
         grid.addWidget(startSimButton, 1, 0)
-        grid.addWidget(newLayerButton, 1, 1)
+        grid.addLayout(buttonGrid, 1, 1)
         grid.addLayout(treeGrid, 0, 1)
 
     def init_tree(self):
