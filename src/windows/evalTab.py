@@ -34,7 +34,7 @@ class EvalTab(QtGui.QWidget):
         self.inputEdit = QtGui.QTextEdit()
 
         # create button
-        self.evalButton = QtGui.QPushButton('Plot')
+        self.evalButton = QtGui.QPushButton('Evaluate')
         self.evalButton.clicked.connect(self.evaluate)
 
         # create layout

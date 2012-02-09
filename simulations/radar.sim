@@ -2,26 +2,26 @@
 S'duration'
 p1
 F5e-09
-sS'delta'
-p2
-(F0.001
-F0.001
-tp3
 sS'size'
-p4
+p2
 (F0.2
 F0.4
+tp3
+sS'delta'
+p4
+(F0.001
+F0.001
 tp5
 s.(lp0
 (lp1
 Vreceiver 1
 p2
-aF0.05
+aF0.07
 aF0.01
 aa(lp3
 Vreceiver 2
 p4
-aF0.15
+aF0.13
 aF0.01
 aa.(lp0
 (lp1
@@ -53,30 +53,30 @@ p11
 aVepsilon(er=5.0)
 p12
 aa(lp13
-Vantenna 1
+Vantenna 2
 p14
-aVx >= 0.045 and x <= 0.055 and y >= 0.008 and y < 0.01
+aVx >= 0.095 and x <= 0.105 and y >= 0.008 and y < 0.01
 p15
 aVepsilon(sigma=59.1e6)
 p16
 aa(lp17
-Vantenna 2
+Vobject
 p18
-aVx >= 0.095 and x <= 0.105 and y >= 0.008 and y < 0.01
+aV(x-0.05)**2 + (y-0.35)**2 < 0.025**2
 p19
 aVepsilon(sigma=59.1e6)
 p20
 aa(lp21
-Vantenna 3
+Vantenna 1
 p22
-aVx >= 0.145 and x <= 0.155 and y >= 0.008 and y < 0.01
+aVx >= 0.065 and x <= 0.075 and y >= 0.008 and y < 0.01
 p23
 aVepsilon(sigma=59.1e6)
 p24
 aa(lp25
-Vobject
+Vantenna 3
 p26
-aV(x-0.05)**2 + (y-0.35)**2 < 0.025**2
+aVx >= 0.125 and x <= 0.135 and y >= 0.008 and y < 0.01
 p27
 aVepsilon(sigma=59.1e6)
 p28
