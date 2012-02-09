@@ -16,36 +16,36 @@ class NumpyParser:
         # not callback
         def callback_not(x, kargs):
             # parse not
-            return self.unary_parser(x, 'not', numpy.logical_not,
+            return self.unary_operator(x, 'not', numpy.logical_not,
                     callback_not_parsable, kargs)
 
         # and callback
         def callback_and(x, kargs):
             # parse and
-            return self.binary_parser(x, None, 'and', numpy.logical_and,
+            return self.binary_operator(x, None, 'and', numpy.logical_and,
                     callback_not, kargs)
 
         # or callback
         def callback_or(x, kargs):
             # parse or
-            return self.binary_parser(x, None, 'or', numpy.logical_or,
+            return self.binary_operator(x, None, 'or', numpy.logical_or,
                     callback_and, kargs)
 
         # try parse xor
-        result = self.binary_parser(expr, None, 'xor', numpy.logical_xor,
+        result = self.binary_operator(expr, None, 'xor', numpy.logical_xor,
                 callback_or, kargs)
 
         # return result
         return result
 
-    def binary_parser(self, x1, x2, keyword, function, callback, kargs):
+    def binary_operator(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
         if isinstance(x1, str):
             expressions = x1.split(keyword)
 
             # check for length of expressions
             if len(expressions) > 1:
-                x1 = self.binary_parser(string.strip(expressions[0]),
+                x1 = self.binary_operator(string.strip(expressions[0]),
                         string.strip(string.join(expressions[1:], keyword)),
                         keyword, function, callback, kargs)
 
@@ -55,7 +55,7 @@ class NumpyParser:
 
             # check for length of expressions
             if len(expressions) > 1:
-                x2 = self.binary_parser(string.strip(expressions[0]),
+                x2 = self.binary_operator(string.strip(expressions[0]),
                         string.strip(string.join(expressions[1:], keyword)),
                         keyword, function, callback, kargs)
 
@@ -98,7 +98,7 @@ class NumpyParser:
         # return
         return result
 
-    def unary_parser(self, x1, keyword, function, callback, kargs):
+    def unary_operator(self, x1, keyword, function, callback, kargs):
         # check type of x1
         if isinstance(x1, str):
             expressions = x1.split(keyword)
@@ -143,7 +143,7 @@ class NumpyParser:
         return result
 
 if __name__ == '__main__':
-    expr = 'sin(X) > 0.1'
+    expr = 'sin(X) > 0.1 and sin(Y) > 0.1'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1),
             numpy.arange(0.0, 1.0, 0.1))
