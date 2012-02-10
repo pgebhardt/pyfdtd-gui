@@ -1,3 +1,4 @@
+import sys
 from PySide import QtGui
 from PySide import QtCore
 import pyfdtd
@@ -41,9 +42,14 @@ class MainWindow(QtGui.QMainWindow):
         for action in self.scriptActions:
             scriptMenu.addAction(action)
 
+        # create log viewer
+        logViewer = plugins.LogViewer()
+        logViewer.setMaximumHeight(100.0)
+        sys.stderr = logViewer
+        sys.stdout = logViewer
+
         # init tab view
         tabView = QtGui.QTabWidget()
-        self.setCentralWidget(tabView)
 
         # create edit tab
         self.editTab = EditTab(self)
@@ -62,6 +68,17 @@ class MainWindow(QtGui.QMainWindow):
         self.progressBar = QtGui.QProgressBar()
         self.progressBar.setRange(0.0, 100.0)
         statusBar.addPermanentWidget(self.progressBar, 1)
+
+        # create container
+        container = QtGui.QWidget()
+        container.setContentsMargins(0, 0, 0, 0)
+        self.setCentralWidget(container)
+
+        # create layout
+        root = QtGui.QVBoxLayout()
+        root.addWidget(tabView)
+        root.addWidget(logViewer)
+        container.setLayout(root)
 
     def create_actions(self):
         # create action list

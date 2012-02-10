@@ -7,7 +7,6 @@ from matplotlib.backends.backend_qt4agg \
 
 from PySide import QtGui
 from plot import matplotlibCanvas
-from plugins import LogViewer
 from numpy import *
 from scipy import *
 from scipy.signal import *
@@ -39,25 +38,13 @@ class EvalTab(QtGui.QWidget):
         self.evalButton = QtGui.QPushButton('Evaluate')
         self.evalButton.clicked.connect(self.evaluate)
 
-        # create LogViewer
-        self.logviewer = LogViewer()
-        self.logviewer.setMaximumHeight(100.0)
-        sys.stderr = self.logviewer
-        sys.stdout = self.logviewer
-
         # create layout
-        box = QtGui.QVBoxLayout()
-
         root = QtGui.QGridLayout()
         root.addWidget(self.plot, 0, 0)
         root.addWidget(self.inputEdit, 0, 1)
         root.addWidget(self.toolbar, 1, 0)
         root.addWidget(self.evalButton, 1, 1)
-
-        box.addLayout(root)
-        box.addWidget(self.logviewer)
-
-        self.setLayout(box)
+        self.setLayout(root)
 
     def evaluate(self):
         # get input
