@@ -22,9 +22,20 @@ class EditTab(QtGui.QWidget):
         # create plot
         self.plot = Plot(self.mainwindow)
 
-        # create buttons
+        # create simulation buttons
+        simulationButtonBox = QtGui.QHBoxLayout()
+
+        durationEdit = QtGui.QLineEdit(
+                '{}'.format(self.mainwindow.job.config['duration']))
+        durationLabel = QtGui.QLabel('Duration:')
+        durationLabel.setBuddy(durationEdit)
+
         startSimButton = QtGui.QPushButton('Start Simulation')
         startSimButton.clicked.connect(self.mainwindow.run_simulation)
+
+        simulationButtonBox.addWidget(durationLabel)
+        simulationButtonBox.addWidget(durationEdit)
+        simulationButtonBox.addWidget(startSimButton)
 
         # button functions
         def new_layer_clicked():
@@ -100,7 +111,7 @@ class EditTab(QtGui.QWidget):
                 self.plot.update()
 
         # create button grid
-        buttonGrid = QtGui.QGridLayout()
+        layerButtonGrid = QtGui.QGridLayout()
 
         # create new layer button
         newLayerButton = QtGui.QPushButton('New Layer')
@@ -111,8 +122,8 @@ class EditTab(QtGui.QWidget):
         deleteLayerButton.clicked.connect(deleate_layer)
 
         # add buttons to grid layout
-        buttonGrid.addWidget(newLayerButton, 0, 0)
-        buttonGrid.addWidget(deleteLayerButton, 0, 1)
+        layerButtonGrid.addWidget(newLayerButton, 0, 0)
+        layerButtonGrid.addWidget(deleteLayerButton, 0, 1)
 
         # create tree view
         treeGrid = QtGui.QGridLayout()
@@ -130,8 +141,8 @@ class EditTab(QtGui.QWidget):
         treeGrid.addWidget(self.treeWidget, 1, 0)
 
         grid.addWidget(self.plot, 0, 0)
-        grid.addWidget(startSimButton, 1, 0)
-        grid.addLayout(buttonGrid, 1, 1)
+        grid.addLayout(simulationButtonBox, 1, 0)
+        grid.addLayout(layerButtonGrid, 1, 1)
         grid.addLayout(treeGrid, 0, 1)
 
     def init_tree(self):

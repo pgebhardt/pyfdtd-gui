@@ -1,0 +1,45 @@
+(dp0
+S'duration'
+p1
+F5e-09
+sS'delta'
+p2
+(F0.001
+F0.001
+tp3
+sS'size'
+p4
+(F2.0
+F1.0
+tp5
+s.(lp0
+.(lp0
+.(dp0
+S'magnetic'
+p1
+(lp2
+sS'electric'
+p3
+(lp4
+(lp5
+Vground plane
+p6
+aVx < 0.002
+p7
+aVepsilon(sigma=59.1e6)
+p8
+aa(lp9
+Vdielectric layer
+p10
+aVx >= 0.002 and x < 0.008
+p11
+aVepsilon(er=5.0)
+p12
+aa(lp13
+Vantenna 1
+p14
+aVx >= 0.008 and x < 0.01 and y >= 0.465 and y <= 0.475
+p15
+aVepsilon(sigma=59.1e6)
+p16
+aas.
