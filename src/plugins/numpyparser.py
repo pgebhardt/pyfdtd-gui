@@ -104,9 +104,11 @@ class NumpyParser:
         kargs[varname] = callback(
                 expr[openingBracket + 1:closingBracket], kargs)
 
-        return self.brackets(expr[:openingBracket] + varname +
-                expr[closingBracket + 1:], callback=callback,
-                kargs=kargs)
+        # substitute brackets
+        expr = expr[:openingBracket] + varname + expr[closingBracket + 1:]
+
+        # recursive call of brackets parser
+        return self.brackets(expr, callback=callback, kargs=kargs)
 
     def binary_operator(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
@@ -213,7 +215,7 @@ class NumpyParser:
         return result
 
 if __name__ == '__main__':
-    expr = '(sin(X) > 0.1 and (sin(Y) > 0.1)) and (sin(X) > 0.2)'
+    expr = '((sin(X) > 0.1) and (sin(Y) > 0.1)) and (sin(X) > 0.2)'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1),
             numpy.arange(0.0, 1.0, 0.1))
