@@ -21,7 +21,7 @@ class matplotlibCanvas(FigureCanvas):
 
         # get background color
         r, g, b, a = palette.color(QtGui.QPalette.Window.Background).toTuple()
-        r, g, b, a = map(lambda x: x / 250.0, (r, g, b, a))
+        r, g, b, a = map(lambda x: x / 255.0, (r, g, b, a))
 
         # create figure
         fig = Figure(figsize=(width, height), dpi=dpi, facecolor=(r, g, b))
