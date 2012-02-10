@@ -15,7 +15,7 @@ signals = map(hilbert, signals)
 
 
 def phaseshift(signal, phase=0):
-    return signal * exp(phase*1j)
+    return signal * exp(phase * 1j)
 
 result = []
 timerange = slice(2.5e-9 / deltaT, 5e-9 / deltaT)
@@ -37,7 +37,7 @@ result = array(result)
 plot.grid(True)
 plot.hold(True)
 
-print linspace(-0.5, 0.5, len(result))[result.argmax()] *pi
+print linspace(-0.5, 0.5, len(result))[result.argmax()] * pi
 
 # plot signals
 for signal in signals:

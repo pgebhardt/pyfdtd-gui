@@ -14,7 +14,7 @@ class SimulationThread(QtCore.QThread):
         # init simulation
         if hasattr(self, 'simulationHistory'):
             # clear simulation
-            self.mainwindow.editTab.update_job()
+            self.mainwindow.editTab.update()
 
         # progress function
         self.simulationHistory = []

@@ -10,7 +10,7 @@ class NumpyParser:
 
     def parse(self, expr, **kargs):
         # parse brackets
-        return self.brackets(expr, self.parse_operators, kargs)
+        return self.brackets(expr, callback=self.parse_operators, kargs=kargs)
 
     def parse_operators(self, expr, kargs):
         # not parsable callback
@@ -42,22 +42,65 @@ class NumpyParser:
         # return result
         return result
 
-    def brackets(self, expr, callback, kargs):
-        # find first closing bracket
-        closingBracket = expr.find(')')
+    def brackets(self, expr, excludes=[], callback=None, kargs={}):
+        # init brackets
+        openingBracket, closingBracket = -1, -1
 
-        # find corresponding opening bracket
-        openingBracket = expr.rfind('(', 0, closingBracket)
+        # find a not excluded closing bracket
+        index = 0
+
+        while True:
+            # get closing bracket
+            index = expr.find(')', index + 1)
+
+            # call callback if no bracket is found
+            if index == -1:
+                return callback(expr, kargs)
+
+            # check for not excluded
+            for oB, cB in excludes:
+                if index == cB:
+                    # bracket already excluded, try next
+                    break
+
+            else:
+                # not excluded closing bracket found
+                closingBracket = index
+                break
+
+        # find a not excluded opening bracket
+        index = closingBracket
+
+        while True:
+            # get opening bracket
+            index = expr.rfind('(', 0, index)
+
+            # if no opening bracket is found raise error
+            if index == -1:
+                raise ValueError('invalid expressions: {}'.format(expr))
+
+            # check for not excluded opening bracket
+            for oB, cB in excludes:
+                if index == oB:
+                    # bracket already excluded, try next
+                    break
+
+            else:
+                # not excluded closing bracket found
+                openingBracket = index
+                break
+
+        # check for a valid pair of brackets
+        if openingBracket != 0:
+            if expr[openingBracket - 1] != ' ' and \
+                    expr[openingBracket - 1] != '(':
+                    # not valid
+                    print '({}, {}) not valid'.format(openingBracket,
+                            closingBracket)
+                    return self.brackets(expr, excludes + [(openingBracket,
+                        closingBracket)], callback, kargs)
+
         print openingBracket, closingBracket
-
-        # check for a valid bracket
-        if openingBracket != -1 and (expr[openingBracket - 1] == '(' or
-                expr[openingBracket - 1] == ' ' or openingBracket == 0):
-            print 'valid brackets'
-
-        else:
-            # return standat
-            return callback(expr, kargs)
 
     def binary_operator(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
