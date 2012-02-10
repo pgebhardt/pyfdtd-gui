@@ -2,19 +2,36 @@
 S'duration'
 p1
 F5e-09
-sS'delta'
-p2
-(F0.001
-F0.001
-tp3
 sS'size'
-p4
+p2
 (F2.0
 F1.0
+tp3
+sS'delta'
+p4
+(F0.001
+F0.001
 tp5
 s.(lp0
-.(lp0
-.(dp0
+(lp1
+Vreceiver 1
+p2
+aF0.01
+aF0.47
+aa(lp3
+Vreceiver 2
+p4
+aF0.01
+aF0.53
+aa.(lp0
+(lp1
+Vsender
+p2
+aV(x-0.01)**2 / 0.001**2 + (y-0.5)**2 / 0.01**2 < 1.0
+p3
+aVpulse(1e4, 200e-12, 7.5e9, 1e-9)
+p4
+aa.(dp0
 S'magnetic'
 p1
 (lp2
@@ -42,4 +59,18 @@ aVx >= 0.008 and x < 0.01 and y >= 0.465 and y <= 0.475
 p15
 aVepsilon(sigma=59.1e6)
 p16
+aa(lp17
+Vantenna 2
+p18
+aVx >= 0.008 and x < 0.01 and y >= 0.495 and y < 0.505
+p19
+aVepsilon(sigma=59.1e6)
+p20
+aa(lp21
+Vantenna 3
+p22
+aVx >= 0.008 and x < 0.01 and y >= 0.525 and y < 0.535
+p23
+aVepsilon(sigma=59.1e6)
+p24
 aas.
