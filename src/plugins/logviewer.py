@@ -1,7 +1,7 @@
 from PySide import QtGui
 
 
-class LogViewer(QtGui.QPlainTextEdit):
+class LogViewer(QtGui.QTextEdit):
     def __init__(self):
         # call base class constructor
         super(LogViewer, self).__init__()
@@ -11,4 +11,8 @@ class LogViewer(QtGui.QPlainTextEdit):
 
     def write(self, txt):
         # default write method for streaming compatibility
-        self.appendPlainText(str(txt))
+        self.setPlainText(self.toPlainText() + txt)
+
+        # scroll to bottom
+        self.moveCursor(QtGui.QTextCursor.End)
+        self.ensureCursorVisible()

@@ -57,9 +57,6 @@ class EvalTab(QtGui.QWidget):
         # clear axes
         plot.cla()
 
-        # clear logviewer
-        self.logviewer.setPlainText('')
-
         # evaluate
         exec(inputText)
 
