@@ -1,16 +1,11 @@
 import os
 os.environ['QT_API'] = 'pyside'
 
-import sys
 from matplotlib.backends.backend_qt4agg \
         import NavigationToolbar2QTAgg as NavigationToolbar
 
 from PySide import QtGui
 from plot import matplotlibCanvas
-from numpy import *
-from scipy import *
-from scipy.signal import *
-from scipy import constants
 
 
 class EvalTab(QtGui.QWidget):
@@ -50,15 +45,20 @@ class EvalTab(QtGui.QWidget):
         # get input
         inputText = self.inputEdit.toPlainText()
 
-        # create propper environment
-        plot = self.plot.axes
-        listener = self.mainwindow.simulation.listener
-
         # clear axes
-        plot.cla()
+        self.plot.axes.cla()
+
+        # add std imports to inputText
+        inputText = """
+from numpy import *
+from scipy import *
+from scipy.signal import *
+from scipy import constants
+        """ + inputText
 
         # evaluate
-        exec(inputText)
+        exec(inputText, {'plot': self.plot.axes, 'listener':
+            self.mainwindow.simulation.listener})
 
         # draw plot
         self.plot.draw()
