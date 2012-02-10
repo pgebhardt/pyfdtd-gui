@@ -1,5 +1,6 @@
 import numpy
 import string
+import random
 
 
 class NumpyParser:
@@ -95,12 +96,17 @@ class NumpyParser:
             if expr[openingBracket - 1] != ' ' and \
                     expr[openingBracket - 1] != '(':
                     # not valid
-                    print '({}, {}) not valid'.format(openingBracket,
-                            closingBracket)
                     return self.brackets(expr, excludes + [(openingBracket,
                         closingBracket)], callback, kargs)
 
-        print openingBracket, closingBracket
+        # add new variable to kargs
+        varname = 'v' + '{}'.format(random.randint(1, 1e6))
+        kargs[varname] = callback(
+                expr[openingBracket + 1:closingBracket], kargs)
+
+        return self.brackets(expr[:openingBracket] + varname +
+                expr[closingBracket + 1:], callback=callback,
+                kargs=kargs)
 
     def binary_operator(self, x1, x2, keyword, function, callback, kargs):
         # check type of x1
@@ -207,7 +213,7 @@ class NumpyParser:
         return result
 
 if __name__ == '__main__':
-    expr = '(sin(X) > 0.1 and sin(Y) > 0.1)'
+    expr = '(sin(X) > 0.1 and (sin(Y) > 0.1)) and (sin(X) > 0.2)'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1),
             numpy.arange(0.0, 1.0, 0.1))
