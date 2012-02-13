@@ -17,8 +17,8 @@
 
 
 from PySide import QtGui
+from widgets import Plot
 import dialogs
-from plot import Plot
 
 
 class EditTab(QtGui.QWidget):

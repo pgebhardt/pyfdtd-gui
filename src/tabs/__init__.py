@@ -16,8 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mainwindow import MainWindow
-from plot import Plot
 from editTab import EditTab
 from evalTab import EvalTab
 from playTab import PlayTab

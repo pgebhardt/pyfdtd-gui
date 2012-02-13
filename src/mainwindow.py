@@ -22,9 +22,8 @@ from PySide import QtCore
 from lib import pyfdtd
 from lib.booleanparser import BooleanParser
 import dialogs
-from evalTab import EvalTab
-from editTab import EditTab
-from playTab import PlayTab
+import widgets
+import tabs
 import simulation
 import plugins
 
@@ -61,7 +60,7 @@ class MainWindow(QtGui.QMainWindow):
             scriptMenu.addAction(action)
 
         # create log viewer
-        logViewer = plugins.LogViewer()
+        logViewer = widgets.LogViewer()
         logViewer.setMaximumHeight(100.0)
         sys.stderr = logViewer
         sys.stdout = logViewer
@@ -70,15 +69,15 @@ class MainWindow(QtGui.QMainWindow):
         tabView = QtGui.QTabWidget()
 
         # create edit tab
-        self.editTab = EditTab(self)
+        self.editTab = tabs.EditTab(self)
         tabView.addTab(self.editTab, 'Edit')
 
         # create play tab
-        self.playTab = PlayTab(self)
+        self.playTab = tabs.PlayTab(self)
         tabView.addTab(self.playTab, 'Play')
 
         # create edit tab
-        self.evalTab = EvalTab(self)
+        self.evalTab = tabs.EvalTab(self)
         tabView.addTab(self.evalTab, 'Evaluate')
 
         # create status bar

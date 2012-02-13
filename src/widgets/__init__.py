@@ -16,25 +16,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import sys
-from PySide import QtGui
-import matplotlib
-matplotlib.use('Qt4Agg')
-
-from mainwindow import MainWindow
-
-
-def main():
-    # create application
-    app = QtGui.QApplication(sys.argv)
-
-    # create mainWindow
-    mainWindow = MainWindow()
-    mainWindow.show()
-
-    # run main loop
-    sys.exit(app.exec_())
-
-# call main function
-if __name__ == '__main__':
-    main()
+from logviewer import LogViewer
+from plot import Plot, matplotlibCanvas

@@ -17,7 +17,7 @@
 
 
 from PySide import QtGui, QtCore
-from plot import Plot
+from widgets import Plot
 import numpy
 
 

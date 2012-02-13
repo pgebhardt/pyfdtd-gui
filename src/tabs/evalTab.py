@@ -23,7 +23,7 @@ from matplotlib.backends.backend_qt4agg \
         import NavigationToolbar2QTAgg as NavigationToolbar
 
 from PySide import QtGui
-from plot import matplotlibCanvas
+from widgets import matplotlibCanvas
 
 
 class EvalTab(QtGui.QWidget):
