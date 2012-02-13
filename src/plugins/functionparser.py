@@ -1,5 +1,4 @@
-import pyfdtd.material as material
-from pyfdtd.source import source
+from lib import pyfdtd
 from types import FunctionType
 from numpy import *
 from math import *
@@ -31,8 +30,8 @@ def source_from_string(expression):
 
 def material_from_string(expression):
     # try parse standart functions
-    function = eval(expression, {'epsilon': material.epsilon, 'mu':
-        material.mu})
+    function = eval(expression, {'epsilon': pyfdtd.material.epsilon, 'mu':
+        pyfdtd.material.mu})
 
     # check for function type
     if isinstance(function, FunctionType):

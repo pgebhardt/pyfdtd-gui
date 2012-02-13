@@ -1,7 +1,8 @@
 import sys
 from PySide import QtGui
 from PySide import QtCore
-import pyfdtd
+from lib import pyfdtd
+from lib.booleanparser import BooleanParser
 import dialogs
 import jobs
 from evalTab import EvalTab
@@ -220,7 +221,7 @@ class MainWindow(QtGui.QMainWindow):
             self.progressBar.setValue(100.0)
 
         # create parser
-        parser = plugins.NumpyParser()
+        parser = BooleanParser()
 
         # init simulation
         self.simulation = pyfdtd.solver(pyfdtd.field(
