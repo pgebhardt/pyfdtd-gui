@@ -19,41 +19,37 @@
 from lib import pyfdtd
 from types import FunctionType
 from scipy import constants
-import numpy
+from numpy import *
 
 
 def source_from_string(expression):
     # standart pulse function
     def pulse(amplitude=1e3, width=200e-12, freq=20e9, offset=1e-9):
         def res(flux, deltaT, t, mem):
-            value = amplitude * \
-                    numpy.exp(-(t - offset) ** 2 / (2 * width ** 2)) * \
-                    numpy.cos(2 * numpy.pi * freq * (t - offset))
+            value = amplitude * exp(-(t - offset) ** 2 / (2 * width ** 2)) * \
+                    cos(2 * pi * freq * (t - offset))
 
             return -0.5 * deltaT * value
         return res
 
     # try parse standart function
-    function = eval(expression, {'pulse': pulse, 'sin': numpy.sin, 'cos':
-        numpy.cos, 'exp': numpy.exp, 'pi': numpy.pi})
+    function = eval(expression, {'pulse': pulse})
 
     # check for function type
     if isinstance(function, FunctionType):
         return function
 
     # if not a source function, create one
-    def res(flux, deltaT, t, mem):
-        return -0.5 * deltaT * eval(expression)
+    def res(t):
+        return eval(expression)
 
-    return source(res)
+    return pyfdtd.source(res)
 
 
 def material_from_string(expression):
     # try parse standart functions
-    function = eval(expression, {'epsilon': pyfdtd.material.epsilon, 'mu':
-        pyfdtd.material.mu, 'sin': numpy.sin, 'cos': numpy.cos,
-        'exp': numpy.exp, 'pi': numpy.pi, 'c': constants.c,
-        'epsilon_0': constants.epsilon_0, 'mu_0': constants.mu_0})
+    function = eval(expression, {'epsilon': pyfdtd.material.epsilon,
+        'mu': pyfdtd.material.mu})
 
     # check for function type
     if isinstance(function, FunctionType):
