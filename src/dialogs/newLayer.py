@@ -1,16 +1,13 @@
 from PySide import QtGui
 
 
-class NewLayer(QtGui.QWidget):
+class NewLayer(QtGui.QDialog):
     def __init__(self, mainwindow=None):
         # call base class constructor
-        super(NewLayer, self).__init__()
+        super(NewLayer, self).__init__(mainwindow)
 
         # init gui
         self.init_gui()
-
-        # save parameter
-        self.mainwindow = mainwindow
 
     def init_gui(self):
         # set window title

@@ -1,16 +1,13 @@
-from PySide import QtGui, QtCore
+from PySide import QtGui
 
 
-class NewSimulation(QtGui.QWidget):
-    def __init__(self, mainWindow=None):
+class NewSimulation(QtGui.QDialog):
+    def __init__(self, mainwindow=None):
         # call base class constructor
-        super(NewSimulation, self).__init__()
+        super(NewSimulation, self).__init__(mainwindow)
 
         # init gui
         self.init_gui()
-
-        # save parameter
-        self.mainWindow = mainWindow
 
     def init_gui(self):
         # set window title
