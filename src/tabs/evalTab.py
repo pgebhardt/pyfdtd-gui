@@ -72,7 +72,7 @@ from numpy import *
 from scipy import *
 from scipy.signal import *
 from scipy import constants
-        """ + inputText
+""" + inputText
 
         # evaluate
         exec(inputText, {'plot': self.plot.axes, 'listener':
