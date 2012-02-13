@@ -16,4 +16,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from simulation import SimulationThread
+from thread import SimulationThread
+from job import Job

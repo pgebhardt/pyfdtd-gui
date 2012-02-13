@@ -22,7 +22,6 @@ from PySide import QtCore
 from lib import pyfdtd
 from lib.booleanparser import BooleanParser
 import dialogs
-import jobs
 from evalTab import EvalTab
 from editTab import EditTab
 from playTab import PlayTab
@@ -39,7 +38,7 @@ class MainWindow(QtGui.QMainWindow):
         # init simulation
         self.simulation = pyfdtd.solver(pyfdtd.field(
             (0.4, 0.4), (0.001, 0.001)))
-        self.job = jobs.Job()
+        self.job = simulation.Job()
 
         # initialize gui elements
         self.create_actions()
@@ -143,7 +142,7 @@ class MainWindow(QtGui.QMainWindow):
             self.newSimDialog.close()
 
             # update job
-            self.job = jobs.Job()
+            self.job = simulation.Job()
             self.job.config['size'] = (
                     float(self.newSimDialog.xSizeEdit.text()),
                     float(self.newSimDialog.ySizeEdit.text()))
