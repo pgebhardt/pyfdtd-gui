@@ -106,6 +106,7 @@ class NumpyParser:
 
         # substitute brackets
         expr = expr[:openingBracket] + varname + expr[closingBracket + 1:]
+        print expr
 
         # recursive call of brackets parser
         return self.brackets(expr, callback=callback, kargs=kargs)
@@ -215,7 +216,7 @@ class NumpyParser:
         return result
 
 if __name__ == '__main__':
-    expr = '((sin(X) > 0.1) and (sin(Y) > 0.1)) and (sin(X) > 0.2)'
+    expr = '((sin(X) > 0.1) and (sin(Y) > 0.1)) and (sin(X) < 0.5)'
 
     X, Y = numpy.meshgrid(numpy.arange(0.0, 1.0, 0.1),
             numpy.arange(0.0, 1.0, 0.1))
