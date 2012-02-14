@@ -3,4 +3,4 @@
 	url = https://schansge@github.com/schansge/pyfdtd.git
 [submodule "src/lib/booleanparser"]
 	path = src/lib/booleanparser
-	url = git://gist.github.com/1811180.git
+	url = https://schansge@github.com/schansge/booleanparser.git
