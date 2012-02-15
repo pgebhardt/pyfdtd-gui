@@ -1,6 +1,6 @@
 [submodule "src/lib/pyfdtd"]
 	path = src/lib/pyfdtd
-	url = https://schansge@github.com/schansge/pyfdtd.git
+	url = git://github.com/schansge/pyfdtd.git
 [submodule "src/lib/booleanparser"]
 	path = src/lib/booleanparser
-	url = https://schansge@github.com/schansge/booleanparser.git
+	url = git://github.com/schansge/booleanparser.git
