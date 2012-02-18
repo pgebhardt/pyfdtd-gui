@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import pickle
+import json
 
 
 class Job:
@@ -32,11 +32,14 @@ class Job:
         # open file
         f = open(fname, 'rb')
 
-        # unpickle
-        self.config = pickle.load(f)
-        self.listener = pickle.load(f)
-        self.source = pickle.load(f)
-        self.material = pickle.load(f)
+        # unjson
+        indict = json.load(f)
+
+        # extract file
+        self.config = indict['config']
+        self.material = indict['material']
+        self.source = indict['source']
+        self.listener = indict['listener']
 
         # close file
         f.close()
@@ -45,11 +48,12 @@ class Job:
         # open file
         f = open(fname, 'wb')
 
-        # pickle
-        pickle.dump(self.config, f)
-        pickle.dump(self.listener, f)
-        pickle.dump(self.source, f)
-        pickle.dump(self.material, f)
+        # put everything in one dict
+        outdict = {'config': self.config, 'material': self.material,
+                'source': self.source, 'listener': self.listener}
+
+        # json
+        json.dump(outdict, f, sort_keys=True, indent=4)
 
         # close file
         f.close()
