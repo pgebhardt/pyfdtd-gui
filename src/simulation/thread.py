@@ -41,7 +41,7 @@ class SimulationThread(QtCore.QThread):
             xShape, yShape = field.oddFieldX['flux'].shape
             interval = xShape * yShape * \
                     self.mainwindow.job.config['duration'] / \
-                    (256e6 / 4.0)
+                    (512e6 / 4.0)
 
             # save history
             if t / deltaT % (interval / deltaT) < 1.0:
