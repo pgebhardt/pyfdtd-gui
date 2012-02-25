@@ -17,4 +17,3 @@
 
 
 from thread import SimulationThread
-from job import Job

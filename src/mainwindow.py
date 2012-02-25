@@ -20,12 +20,10 @@ import sys
 from PySide import QtGui
 from PySide import QtCore
 from lib import pyfdtd
-from lib.booleanparser import BooleanParser
 import dialogs
 import widgets
 import tabs
 import simulation
-import plugins
 
 
 # Main window for pyfdtd-gui application
@@ -37,7 +35,7 @@ class MainWindow(QtGui.QMainWindow):
         # init simulation
         self.simulation = pyfdtd.solver(pyfdtd.field(
             (0.4, 0.4), (0.001, 0.001)))
-        self.job = simulation.Job()
+        self.job = pyfdtd.Job()
 
         # initialize gui elements
         self.create_actions()
@@ -141,7 +139,7 @@ class MainWindow(QtGui.QMainWindow):
             self.newSimDialog.close()
 
             # update job
-            self.job = simulation.Job()
+            self.job = pyfdtd.Job()
             self.job.config['size'] = (
                     float(self.newSimDialog.xSizeEdit.text()),
                     float(self.newSimDialog.ySizeEdit.text()))
@@ -236,33 +234,8 @@ class MainWindow(QtGui.QMainWindow):
             self.updateTimer.stop()
             self.progressBar.setValue(100.0)
 
-        # create parser
-        parser = BooleanParser()
-
-        # init simulation
-        self.simulation = pyfdtd.solver(pyfdtd.field(
-            self.job.config['size'], self.job.config['delta']))
-
-        # get meshgrid
-        x, y = self.simulation.material['electric'].meshgrid
-
-        # create materials
-        for name, mask, function in self.job.material['electric']:
-            self.simulation.material['electric'][parser.parse(str(mask),
-                x=x, y=y)] = plugins.material_from_string(function)
-
-        for name, mask, function in self.job.material['magnetic']:
-            self.simulation.material['magnetic'][parser.parse(str(mask),
-                x=x, y=y)] = plugins.material_from_string(function)
-
-        # create sources
-        for name, mask, function in self.job.source:
-            self.simulation.source[parser.parse(str(mask),
-                x=x, y=y)] = plugins.source_from_string(function)
-
-        # create listener
-        for name, x, y in self.job.listener:
-            self.simulation.listener.append(pyfdtd.listener(x, y))
+        # create solver
+        self.simulation = self.job.get_solver()
 
         # create simulation thread
         self.simulationThread = simulation.SimulationThread(self)

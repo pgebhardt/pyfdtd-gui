@@ -28,7 +28,7 @@ from matplotlib.figure import Figure
 import matplotlib.colors as colors
 
 from PySide import QtGui
-from lib.booleanparser import BooleanParser
+from lib import pyfdtd
 
 
 class matplotlibCanvas(FigureCanvas):
@@ -97,7 +97,7 @@ class Plot(QtGui.QWidget):
         deltaX, deltaY = self.mainwindow.job.config['delta']
 
         # create parser
-        parser = BooleanParser()
+        parser = pyfdtd.parser.BooleanParser()
 
         # get meshgrid
         x, y = numpy.meshgrid(numpy.arange(0.0, sizeX, deltaX),
