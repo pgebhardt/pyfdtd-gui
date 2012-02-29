@@ -45,8 +45,8 @@ class SimulationThread(QtCore.QThread):
 
             # save history
             if t / deltaT % (interval / deltaT) < 1.0:
-                self.simulationHistory.append(field.oddFieldX['field']
-                        + field.oddFieldY['field'])
+                self.simulationHistory.append((field.oddFieldX['field']
+                        + field.oddFieldY['field']).get())
 
             # print progess
             self.progress = t * 100.0 / self.mainwindow.job.config['duration']

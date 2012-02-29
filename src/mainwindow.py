@@ -17,6 +17,7 @@
 
 
 import sys
+import pyopencl as cl
 from PySide import QtGui
 from PySide import QtCore
 from lib import pyfdtd
@@ -32,10 +33,13 @@ class MainWindow(QtGui.QMainWindow):
         # call base class constructor
         super(MainWindow, self).__init__()
 
+        # init opencl
+        self.ctx = cl.create_some_context()
+        self.queue = cl.CommandQueue(self.ctx)
+
         # init simulation
-        self.simulation = pyfdtd.solver(pyfdtd.field(
-            (0.4, 0.4), (0.001, 0.001)))
         self.job = pyfdtd.Job()
+        self.simulation = self.job.get_solver(self.ctx, self.queue)
 
         # initialize gui elements
         self.create_actions()
@@ -181,10 +185,6 @@ class MainWindow(QtGui.QMainWindow):
             # load job
             self.job.load(fname)
 
-            # create new simulation
-            self.simulation = pyfdtd.solver(pyfdtd.field(
-                self.job.config['size'], self.job.config['delta']))
-
             # update edit tab
             self.editTab.update()
             self.playTab.update()
@@ -235,7 +235,7 @@ class MainWindow(QtGui.QMainWindow):
             self.progressBar.setValue(100.0)
 
         # create solver
-        self.simulation = self.job.get_solver()
+        self.simulation = self.job.get_solver(self.ctx, self.queue)
 
         # create simulation thread
         self.simulationThread = simulation.SimulationThread(self)
