@@ -33,7 +33,7 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
 
         # init simulation
-        self.simulation = pyfdtd.solver(pyfdtd.field(
+        self.simulation = pyfdtd.Solver(pyfdtd.Field(
             (0.4, 0.4), (0.001, 0.001)))
         self.job = pyfdtd.Job()
 
@@ -182,7 +182,7 @@ class MainWindow(QtGui.QMainWindow):
             self.job.load(fname)
 
             # create new simulation
-            self.simulation = pyfdtd.solver(pyfdtd.field(
+            self.simulation = pyfdtd.Solver(pyfdtd.Field(
                 self.job.config['size'], self.job.config['delta']))
 
             # update edit tab
